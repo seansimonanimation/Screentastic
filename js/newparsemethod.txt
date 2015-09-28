@@ -1,0 +1,20 @@
+var lineRegExp =/\w{3}>>(.+)(\r\n?|\n)/g;
+var unes = _.unescape(document.body.innerHTML);
+extra =  unes.slice(unes.lastIndexOf("<" + "/tw-storydata>")+15);
+unes = unes.slice(0,unes.lastIndexOf("<" + "/tw-storydata>")+15);
+unes = unes.slice(unes.lastIndexOf("<tw-storydata"));
+var unesarchive = unes;
+var matchedyay = unes.match(lineRegExp)
+var newmatchedyay = [];
+for (i=0; i < matchedyay.length; i++) {
+    manipstring = matchedyay[i];
+    var lineType = manipstring.substring(0,3);
+    var lineContent = manipstring.substring(5);
+    //kill the extra whitespace later
+    var result = '';
+    result = '<div id=\"' + lineType + 'Cont\">' + lineContent + "</div>\r\n";
+    newmatchedyay[i] = result;
+    unes = unes.replace(matchedyay[i], newmatchedyay[i]);
+}
+unes = "<div id=\"page\">" + unes + "</div>";
+document.body.innerHTML = unes + extra;

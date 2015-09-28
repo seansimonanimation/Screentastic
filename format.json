@@ -1,0 +1,10 @@
+{
+	"name": "Screentastic",
+	"version": "0.1.0",
+	"description": "A Twine 2 Story Format for creating Interactive Screenplays.",
+	"author": "Sean Simon",
+	"image": "icon.svg",
+	"url": "seansimonanimation.webuda.com",
+	"license": "MIT License", 
+	"proofing": false
+}
