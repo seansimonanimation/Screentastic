@@ -48,3 +48,9 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 	margin-right: auto;
 	width: 800px;	
       }
+#parCont {
+	display: block;
+	position: relative;
+	margin: auto;
+	width: 275px;
+	}

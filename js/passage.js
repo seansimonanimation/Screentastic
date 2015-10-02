@@ -30,50 +30,15 @@ _.extend(Passage.prototype, {
 		// Remove // comments
 		// to avoid clashes with URLs, lines must start with these
 		unes = unes.replace(/^\/\/.*(\r\n?|\n)/g, '');
-		/*Here's where we differ from snowman. They're looking for items to start with BBS notation, we're looking for our own deal.
+
+		/*Here's where we start to differ from snowman. They're looking for items to start with BBS notation, we're looking for our own deal.
 		Our format looks like this:
 			itm>>text
 			itm>>text
 		*/
-		
 
-		var lineRegExp =/\w{3}>>(.+)(\r\n?|\n)/g;
-		var sourceMatches = unes.match(lineRegExp); //returns an array of all matches.
-		try {
-			var newSourceMatches = [];
-			var manipstring = '';
-			var linestring = '';
-			for (var i=0; i < sourceMatches.length; i++) {
-				manipstring = sourceMatches[i];
-				var lineType = manipstring.substring(0,3);
-				var lineContent = manipstring.substring(5);
-				linestring = '<div id=\"' + lineType + 'Cont\">' + lineContent + "</div>\r\n";
-				newSourceMatches[i] = linestring;
-				unes = unes.replace(sourceMatches[i], newSourceMatches[i]);
-			}
-
-			//[[links]]... using default Twine format for links, so stolen from Snowman. But... This code makes no sense. From what I can tell, Chris's target means NOTHING.
-
-			var linkHunter = /\[\[(.*?)\]\]/g;
-			var linkMatches = unes.match(linkHunter);
-			var finishedLinks = [];
-			for (i=0; i < linkMatches.length; i++) {
-				var barIndex = linkMatches[i].indexOf('|');
-				var linkSize = linkMatches[i].length - 2;
-				var display = linkMatches[i].slice(2, barIndex);
-				var target = linkMatches[i].slice(barIndex + 1, linkSize);
-				if (/^\w+:\/\/\/?\w/i.test(target)) {
-					finishedLinks[i] = '<a href="' + target + '">' + display + '</a>';
-				} else {
-					finishedLinks[i] = '<a href="javascript:void(0)" data-passage="' + _.escape(target) + '">' + display + '</a>';
-				}
-				unes = unes.replace(linkMatches[i], finishedLinks[i]);
-			}
-			
-		} catch(err) {
-			unes = '(This passage has no data.)'; //error catching, yay!
-		}
-		return unes;
+		var result = this._formatMachine(unes); //Takes both arrays and returns the completed text!
+		return result;
 	},
 	
 
@@ -88,5 +53,58 @@ _.extend(Passage.prototype, {
 		} else {
 			return jQuery.apply(window, arguments);
 		}
+	},
+	_formatMachine: function(original){ //note to self: make regex to turn js newlines into HTML newlines... may help!
+		var lineRegExp =/\w{3}>>(.+)(\r\n?|\n)/g;
+		var sourceMatches = original.match(lineRegExp); //returns an array of all line matches where the lines begin with itm>>.
+		var newSourceMatches = [];
+		var manipstring = '';
+		var linestring = '';
+		var i;
+		var linksExist;
+		var textExists;
+		try {
+			textExists = true;
+			for (i=0; i < sourceMatches.length; i++) {
+				manipstring = sourceMatches[i];
+				var lineType = manipstring.substring(0,3);
+				var lineContent = manipstring.substring(5);
+				linestring = '<div id=\"' + lineType + 'Cont\">' + lineContent + "</div>\r\n";
+				newSourceMatches[i] = linestring;
+				original = original.replace(sourceMatches[i], newSourceMatches[i]);
+			}
+		} catch(err) {
+			textExists = false;
+		}
+		var linkHunter = /\[\[(.*?)\]\]((\r\n?|\n)*)/g;
+		var linkMatches = original.match(linkHunter); //returns an array of all [[links]]  //future feature: except var>>... we'll put those somewhere else.
+		//[[links]]... Snowman's link code made no goddamn sense... so I rewrote it. HAHA! (notes... add the newline possibility to the regex.)
+		var finishedLink = [];
+		try {
+			linksExist = true;
+			for (i=0; i < linkMatches.length; i++) {
+				var barIndex = linkMatches[i].indexOf('|');
+				var endIndex = linkMatches[i].indexOf(']]');
+				var display = linkMatches[i].slice(2, barIndex);
+				var target = linkMatches[i].slice(barIndex + 1,endIndex);
+				var newLine = linkMatches[i].slice(endIndex + 2); 
+				if (/^\w+:\/\/\/?\w/i.test(target)) {
+					finishedLink[i] = '<a href="' + target + '">' + display + '</a>' + '<br>';
+				} else {
+					finishedLink[i] = '<a href="javascript:void(0)" data-passage="' + _.escape(target) + '">' + display + '</a>' + '<br>';
+				}
+			original = original.replace(linkMatches[i], finishedLink[i]);
+			}
+		} catch(err) {
+			linksExist = false;
+		}
+
+
+		if (linksExist === false && textExists === false) {	
+			original = '<center><h1>(This passage has no data.)</h1></center>'; //error catching, yay! Also lazy HTML! Yay!
+		}
+
+	return original;
+
 	},
 });
