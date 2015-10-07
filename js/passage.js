@@ -38,7 +38,8 @@ _.extend(Passage.prototype, {
 		*/
 
 		var result = this._formatMachine(unes); //Takes both arrays and returns the completed text!
-		return result;
+		var holepunch = '<div id="holePunch"><h1 class="tophole">&#9899;</h1><h1 class="midhole">&#9899;</h1><h1 class="bothole">&#9899;</h1></div>'
+		return holepunch + result;
 	},
 	
 
@@ -89,9 +90,9 @@ _.extend(Passage.prototype, {
 				var target = linkMatches[i].slice(barIndex + 1,endIndex);
 				var newLine = linkMatches[i].slice(endIndex + 2); 
 				if (/^\w+:\/\/\/?\w/i.test(target)) {
-					finishedLink[i] = '<a href="' + target + '">' + display + '</a>' + '<br>';
+					finishedLink[i] = '<div id="linkCont"><a href="' + target + '">' + display + '</a>' + '</div>';
 				} else {
-					finishedLink[i] = '<a href="javascript:void(0)" data-passage="' + _.escape(target) + '">' + display + '</a>' + '<br>';
+					finishedLink[i] = '<div id="linkCont"><a href="javascript:void(0)" data-passage="' + _.escape(target) + '">' + display + '</a>' + '</div>';
 				}
 			original = original.replace(linkMatches[i], finishedLink[i]);
 			}
