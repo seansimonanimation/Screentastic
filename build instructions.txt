@@ -3,9 +3,9 @@ to build screentastic:
 
 
 install node.js
-install GnuWin32 ( allow it to wrap into)
+install GnuWin32 ( allow it to wrap into command prompt) (optional step)
 Navigate to the downloaded directory in cmd
 
-run: "npm install"
+run: "npm install" (may have to be run more than once)
 run: "gulp"
 run: "gulp release"

@@ -1,0 +1,68 @@
+#menuButton {
+	position: fixed;
+	height: 35px;
+	width: 50px;
+	right: 20px;
+	color: #999;
+	border:solid;
+	border-width: 3px;
+	border-color: #999;
+	background-color: #EEE;
+	text-align: center;
+	line-height: 50px;
+	cursor: pointer;
+	font-size: 500%;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.menuHereButton {
+	top: 98px;
+	padding-top: 15px;
+}
+.menuAwayButton {
+	top:-1px;
+	padding-top: 15px;
+	-webkit-transform:rotate(-180deg);
+	-moz-transform:rotate(-180deg); 
+	-o-transform:rotate(-180deg); 
+	transform:rotate(-180deg);
+	ms-filter:"progid:DXImageTransform.Microsoft.BasicImage(rotation=2)";
+	filter:progid:DXImageTransform.Microsoft.BasicImage(rotation=2);
+
+}
+
+#menuBar {
+	position: fixed;
+	left: -5%;
+	height: 100px;
+	width: 110%;
+	color: #333;
+	border: solid;
+	border-width: 3px;
+	border-color: #999;
+	background-color: #EEE;
+	text-align: center;
+}
+
+.menuGone {
+	top: -110px;
+}
+.menuHere {
+	top: -5px;
+}
+
+
+
+
+
+/* page-moving stuffs is broken atm... TODO: find out why. */
+.pageDefaultPos {
+}
+
+.pageMenuPos {
+top: 100px;
+}

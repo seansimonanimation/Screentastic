@@ -55,7 +55,7 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 #linkCont {
 	margin-left: auto;
 	margin-right: auto;
-	width: 80%
+	width: 80%;
 }
 
 #pageNumberCont {
@@ -69,6 +69,7 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 /*The things below this line are for funsies and are not actually important to making things industry standard*/
 
 #holePunch {
+	font-family: Arial, Helvetica, Sans-Serif;
 	position: absolute;
 	height: 1122px;
 	margin-top: -75px;

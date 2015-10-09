@@ -8,10 +8,14 @@
 <!-- build:css min.css -->
 <link rel="stylesheet" href="css/font.css">
 <link rel="stylesheet" href="css/screenStyle.css">
+<link rel="stylesheet" href="css/menuStyle.css">
 <!-- endbuild -->
 </head>
 <body>
-<div id="page">
+<div id="menuBar" class="menuGone"><div style="margin-top:30px;">Right now the menu content is empty... Sorry...<br />
+If it helps, I've set up the framework, so I'm working on it :D</div></div>
+<div id="menuButton" class="menuAwayButton" onclick="menuButtonFunc()">^</div>
+<div id="page" class="pageDefaultPos">
 //= include data/passages.html
 </div>
 
@@ -23,6 +27,7 @@
 <script src="lib/marked.js"></script>
 <script src="lib/lz-string.js"></script>
 
+<script src="js/menuJS.js"></script>
 <script src="js/passage.js"></script>
 <script src="js/story.js"></script>
 <script src="js/init.js"></script>

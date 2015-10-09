@@ -1,0 +1,44 @@
+*************
+CHANGE LOG!!!
+*************
+
+v0.1.0
+------
+Initial release!
+
+known bugs:
+1) Links appear all on the same line, for some reason.
+
+v0.2.1
+------
+changes:
+--All links now have exactly one line break after them.
+--Added parantheticals. par>> activates.
+--general maintainence stuffs
+--started adding infrastructure for future features.
+
+known bugs:
+--text starts immediately at the top of the #page element, and looks ugly. DE-UGLIFY!
+
+
+v0.2.7
+------
+Changes:
+--Formatted the #page element to look like an 8.5x11 page!
+--Added fun little 3 hole punches on the left side!
+
+known bugs:
+--The Three hole punch uses a unicode character, which does not exist in either Courier Prime or Twine. Need to change to something that renders properly or fix it so that it does.
+--There's no error catching for when a passage extends beyond the #page element. Need to add either a scroll bar in the page or seperate out pages. Scroll bar is the lazy fix, multiple page fix is the smart option (smart for printing later).
+
+v0.2.8
+------
+
+Changes:
+--Added a menu! There's nothing in it yet, but it exists! Woo!
+	--Planned items for menu: Quicksave/load, save to PDF, print. (others, too? There's plenty of room...)
+
+Known bugs: 
+--Dropping the menu and simultaneously dropping the #page div destroys the passage data. Gotta find out why... For now, the menu just covers the passage.
+--Passage text shows through the window... it should go under (fix with z-index).
+--Same bugs from last time.
