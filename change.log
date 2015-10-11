@@ -33,7 +33,6 @@ known bugs:
 
 v0.2.8
 ------
-
 Changes:
 --Added a menu! There's nothing in it yet, but it exists! Woo!
 	--Planned items for menu: Quicksave/load, save to PDF, print. (others, too? There's plenty of room...)
@@ -42,3 +41,18 @@ Known bugs:
 --Dropping the menu and simultaneously dropping the #page div destroys the passage data. Gotta find out why... For now, the menu just covers the passage.
 --Passage text shows through the window... it should go under (fix with z-index).
 --Same bugs from last time.
+
+v0.2.9/a/b/c
+------------
+Changes:
+--Added the icons for the menu. They don't work right now and all they do is throw up an alert, telling you that the functionality's not in yet.
+--Fixed the spacing on scene headers.
+--Fixed the hole punches. They display correctly in the Twine player now.
+
+Known bugs:
+-- Still no fix for the text breaking the bottom of the page. For now, just make extra passages as a workaround. I hope to have this fixed for 0.3.0.
+--I need to do something about those massive menu icons. They hurt to look at right now.
+
+Thoughts:
+--I should put in visual themes. That'd be fun. As long as what's on the page isn't changed, we can do whatever!
+--base64 is wonderful.
