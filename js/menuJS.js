@@ -35,10 +35,18 @@ function PDFFunc() {
 	alert("Sorry, PDFs aren't implemented yet... :(");
 }
 
-function quickSave() {
+function quickSaveFunc() {
 	alert("Sorry, saving and loading aren't implemented yet... :(");
 }
 
-function quickLoad() {
+function quickLoadFunc() {
 	alert("Sorry, saving and loading aren't implemented yet... :(");
+}
+
+function forwardFunc() {
+	alert("Sorry, Forward movement through passages isn't implemented yet... :(");
+}
+
+function backFunc() {
+	alert("Sorry, Backward movement through passages isn't implemented yet... :(");
 }

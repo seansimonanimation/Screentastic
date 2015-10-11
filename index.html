@@ -13,9 +13,20 @@
 <!-- endbuild -->
 </head>
 <body>
-<div id="menuBar" class="menuGone"><div style="margin-top:30px;">Right now the menu content is empty... Sorry...<br />
-If it helps, I've set up the framework, so I'm working on it :D</div></div>
+
+<div id="menuBar" class="menuGone">
+	<div id="menuItem" class="backButton" onclick="backFunc()">a</div>
+	<div id="menuItem" class="forwardButton" onclick="forwardFunc()">b</div>
+	<div id="menuItem" class="quickSaveButton" onclick="quickSaveFunc()">e</div>
+	<div id="menuItem" class="quickLoadButton" onclick="quickLoadFunc()">f</div>
+	<div id="menuItem" class="makePDFButton" onclick="PDFFunc()">h</div>
+	<div id="menuItem" class="makePrintButton" onclick="printFunc()">d</div>
+</div>
+
 <div id="menuButton" class="menuAwayButton" onclick="menuButtonFunc()">^</div>
+
+<!-- future: make the menu HTML a seperate file -->
+
 <div id="page" class="pageDefaultPos"><tw-storydata name="An Unreasonably Long Title That Tests The Limits of Everyone's Patience" startnode="1" creator="Twine" creator-version="2.0">
 
 <style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css">

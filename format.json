@@ -1,6 +1,6 @@
 {
 	"name": "Screentastic",
-	"version": "0.2.8",
+	"version": "0.2.9",
 	"description": "A Twine 2 Story Format for creating Interactive Screenplays.",
 	"author": "Sean Simon",
 	"image": "icon.svg",

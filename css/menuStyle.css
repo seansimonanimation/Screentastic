@@ -46,6 +46,9 @@
 	border-color: #999;
 	background-color: #EEE;
 	text-align: center;
+	z-index: 10;
+	white-space: nowrap;
+	overflow: hidden;
 }
 
 .menuGone {
@@ -54,10 +57,29 @@
 .menuHere {
 	top: -5px;
 }
-
-
-
-
+#menuItem {
+	font-family: 'Screentastic_Icons';
+	font-size: 600%;
+	color: #555;
+	position: relative;
+	display: inline-block;
+	margin:0 auto;
+	top: -1px;
+	height: 98%;
+	width: 100px;c
+	background-color:#EEE;
+	border: solid;
+	border-color: #999;
+	cursor:pointer;
+}
+/*TODO: find a better way to do the button positioning...*/
+.backButton {left: 25px;}
+.forwardButton { left: 12.5px;}
+.quickSaveButton { 
+}
+.quickLoadButton { left: -12.5px; }
+.makePDFButton { left: -25px; }
+.makePrintButton { left: -37.5px; }
 
 /* page-moving stuffs is broken atm... TODO: find out why. */
 .pageDefaultPos {

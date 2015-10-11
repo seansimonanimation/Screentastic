@@ -69,7 +69,9 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 /*The things below this line are for funsies and are not actually important to making things industry standard*/
 
 #holePunch {
-	font-family: Arial, Helvetica, Sans-Serif;
+	font-family: 'Screentastic_Icons';
+	font-size: 125%;
+	color: #333;
 	position: absolute;
 	height: 1122px;
 	margin-top: -75px;

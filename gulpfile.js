@@ -100,14 +100,16 @@ gulp.task('release', ['bake:release', 'copy'], function (cb)
 	formatJson.source = formatJson.source.replace(/<link .*?min\.css.*?>/i, '<style>' + css + '</style>');
 	formatJson.source = formatJson.source.replace(/<script .*?min\.js.*?>/i, '<script>' + js + '</script>');
 
-	// save it to dist/Snowman/format.js
+	// save it to dist/(version number)/format.js
 
-	var distPath = 'dist/' + formatJson.name + '/';
+	var currVerPath = 'dist/' + formatJson.version + '/';
 
-	if (! fs.existsSync(distPath))
-		fs.mkdirSync(distPath);
-
-	fs.writeFileSync(distPath + 'format.js', 'window.storyFormat(' + JSON.stringify(formatJson) + ')');
+	if (! fs.existsSync('dist/currentRelease/'))
+		fs.mkdirSync('dist/currentRelease/');
+	if (! fs.existsSync(currVerPath))
+		fs.mkdirSync(currVerPath);
+	fs.writeFileSync('dist/currentRelease/format.js', 'window.storyFormat(' + JSON.stringify(formatJson) + ')');
+	fs.writeFileSync(currVerPath + 'format.js', 'window.storyFormat(' + JSON.stringify(formatJson) + ')');
 	cb();
 });
 

@@ -38,7 +38,7 @@ _.extend(Passage.prototype, {
 		*/
 
 		var result = this._formatMachine(unes); //Takes both arrays and returns the completed text!
-		var holepunch = '<div id="holePunch"><h1 class="tophole">&#9899;</h1><h1 class="midhole">&#9899;</h1><h1 class="bothole">&#9899;</h1></div>';
+		var holepunch = '<div id="holePunch"><h1 class="tophole">m</h1><h1 class="midhole">m</h1><h1 class="bothole">m</h1></div>';
 		return holepunch + result;
 	},
 	
