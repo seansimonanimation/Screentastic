@@ -7,22 +7,22 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 	width: 672px;
 	border-style: solid;
 	border-width: 1px;
-	padding: 75px;
+	padding: 72px;
 	z-index: 1;
 }
 #schCont {
-	display: block;
 	position: relative;
-	margin-left: auto;
-	margin-right: auto;
-	width: 80%;
+	display: block;
+	margin-left: 69px;
+	width: 600px;
 	text-transform: uppercase;
 }
 
 #traCont {
-	display: block;
 	position: relative;
-	width: 80%;
+	display: block;
+	margin-left: 69px;
+	width: 600px;
 	text-transform: uppercase;
 	text-align: right;
 }
@@ -30,36 +30,37 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 #chaCont {
 	position: relative;
 	display: block;
-	margin-left: 40%;
-	width: 50%;
+	margin-left: 288px;
+	width: 250px;
 	text-transform: uppercase;
 }
 
 #diaCont {
-	margin-left: 25%;
-	width: 50%;
-		
+	position: relative;
+	display: block;
+	margin-left: 180px;
+	width: 324px;		
 }
 
 #actCont {
 	position: relative;
 	display: block;
-	margin-left: auto;
-	margin-right: auto;
-	width: 80%
+	margin-left: 69px;
+	width: 600px;
 }
 
 #parCont {
-	display: block;
 	position: relative;
-	margin-left: 30%; 
-	width: 30%;
+	display: block;
+	margin-left: 212px;
+	width: 250px;
 }
 
 #linkCont {
-	margin-left: auto;
-	margin-right: auto;
-	width: 80%;
+	position: relative;
+	display: block;
+	margin-left: 69px;
+	width: 600px;
 }
 
 #pageNumberCont {
