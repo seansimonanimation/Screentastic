@@ -8,6 +8,14 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 	border-style: solid;
 	border-width: 1px;
 	padding: 72px;
+	z-index: 5;
+}
+#passageConstruction {
+	position: absolute;
+	margin: auto;
+	width: 672px;
+	top: -10px;
+	display: none;
 	z-index: 1;
 }
 #schCont {

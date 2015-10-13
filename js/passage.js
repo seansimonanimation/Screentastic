@@ -14,6 +14,12 @@ function Passage (id, name, tags, source) {
 	
 	//The passage's source code. String.
 	this.source = _.unescape(source);
+
+	//a storage place for knowing if text exists in the passage
+	this.textExists = false;
+
+	//a storage place for knowing if links exist
+	this.linkExists = false;
 }
 
 
@@ -25,21 +31,34 @@ _.extend(Passage.prototype, {
 	Returns the HTML source.
 	This is where the magic happens.*/
 	render: function() {
+		var result = '';
 		var unes = _.template(_.unescape(this.source), { s: window.story.state, $: this._readyFunc }); //unes is the unescaped source.
 		unes = unes.replace(/\/\*.*\*\//g, '');
 		// Remove // comments
 		// to avoid clashes with URLs, lines must start with these
 		unes = unes.replace(/^\/\/.*(\r\n?|\n)/g, '');
 
-		/*Here's where we start to differ from snowman. They're looking for items to start with BBS notation, we're looking for our own deal.
-		Our format looks like this:
-			itm>>text
-			itm>>text
-		*/
+		//building the story sketch... Find out if we're in sketchmode to begin with.
+		if (window.sketchMode === false) {
+			if (unes.substring(0,8) == "sketch>>"){
+				window.sketchMode = true; //flip the switch
+				result = this._sketchMachine(unes);  //Takes the unescaped source and returns the completed text!
+			} else {
+				/*This is the code to execute if we're in production mode. we're looking for our own markup. Our format looks like this:
+				itm>>text
+				itm>>text */
+				result = this._formatMachine(unes);//Takes the unescaped source and returns the completed text!
+			} 
+		} else { 
+		//we're in sketch mode now. Sketchmode is a pretty simple concept. It just takes each line and turns it into an unordered list.
+			result = this._sketchMachine(unes);  //Takes the unescaped source and returns the completed text!
+		}
+		result = this._linkMachine(result);
+		if (this.textExists === true || this.linkExists === true) {
+			result = this._pageParser(result); //Need to get things on the right number of pages. Also no need to do it if we've not nothing to parse.
+		}
+		return result;
 
-		var result = this._formatMachine(unes); //Takes both arrays and returns the completed text!
-		var holepunch = '<div id="holePunch"><h1 class="tophole">m</h1><h1 class="midhole">m</h1><h1 class="bothole">m</h1></div>';
-		return holepunch + result;
 	},
 	
 
@@ -55,17 +74,15 @@ _.extend(Passage.prototype, {
 			return jQuery.apply(window, arguments);
 		}
 	},
-	_formatMachine: function(original){ //note to self: make regex to turn js newlines into HTML newlines... may help!
-		var lineRegExp =/\w{3}>>(.+)(\r\n?|\n)/g;
+	_formatMachine: function(original){
+		var lineRegExp =/\w{3}>>(.+)(\r\n|\n)/g;
 		var sourceMatches = original.match(lineRegExp); //returns an array of all line matches where the lines begin with itm>>.
 		var newSourceMatches = [];
 		var manipstring = '';
 		var linestring = '';
 		var i;
-		var linksExist;
-		var textExists;
 		try {
-			textExists = true;
+			this.textExists = true;
 			for (i=0; i < sourceMatches.length; i++) {
 				manipstring = sourceMatches[i];
 				var lineType = manipstring.substring(0,3);
@@ -75,14 +92,47 @@ _.extend(Passage.prototype, {
 				original = original.replace(sourceMatches[i], newSourceMatches[i]);
 			}
 		} catch(err) {
-			textExists = false;
+			this.textExists = false;
 		}
-		var linkHunter = /\[\[(.*?)\]\]((\r\n?|\n)*)/g;
+		if (this.linksExist === false && this.textExists === false) {	
+			original = '<center><h1>(This passage has no data.)</h1></center>'; //error catching, yay! Also lazy HTML! Yay!
+		}
+		var holepunch = '<div id="holePunch"><h1 class="tophole">m</h1><h1 class="midhole">m</h1><h1 class="bothole">m</h1></div>'; //holepunches only need to be in production mode.
+		return holepunch + original;
+
+	},
+	_sketchMachine: function(original) {
+		if (original.slice(0,8) == "sketch>>" ) {
+			original = original.slice(8);
+		}
+		window.derp = original;
+		var lineRegExp =/.+(\r\n|\n)/g;
+		var sourceMatches = original.match(lineRegExp); //returns an array of all lines.
+		var newSourceMatches = [];
+		var manipstring = '';
+		var linestring = '';
+		var i;
+		try {
+			this.textExists = true;
+			for (i=0; i < sourceMatches.length; i++) {
+				manipstring = sourceMatches[i];
+				linestring = '<li>' + manipstring + "</li>\r\n";
+				newSourceMatches[i] = linestring;
+				original = original.replace(sourceMatches[i], newSourceMatches[i]);
+			}
+		} catch(err) {
+			this.textExists = false;
+		}
+		return "<ul>" + original + "</ul>";
+	},
+	_linkMachine: function(original) { 	//insert code for links!
+		var linkHunter = /\[\[(.*?)\]\]((\r\n|\n)*)/g;
 		var linkMatches = original.match(linkHunter); //returns an array of all [[links]]  //future feature: except var>>... we'll put those somewhere else.
 		//[[links]]... Snowman's link code made no goddamn sense... so I rewrote it. HAHA! (notes... add the newline possibility to the regex.)
 		var finishedLink = [];
+		var i;
 		try {
-			linksExist = true;
+			this.linksExist = true;
 			for (i=0; i < linkMatches.length; i++) {
 				var barIndex = linkMatches[i].indexOf('|');
 				var endIndex = linkMatches[i].indexOf(']]');
@@ -97,15 +147,33 @@ _.extend(Passage.prototype, {
 			original = original.replace(linkMatches[i], finishedLink[i]);
 			}
 		} catch(err) {
-			linksExist = false;
+			this.linksExist = false;
 		}
-
-
-		if (linksExist === false && textExists === false) {	
-			original = '<center><h1>(This passage has no data.)</h1></center>'; //error catching, yay! Also lazy HTML! Yay!
-		}
-
-	return original;
-
+		return original;
 	},
+	_pageParser: function(original) { //This function automatically figures out how many pages that a passage uses and generates pages accordingly.
+		var tempPassage = document.getElementById("passageConstruction");
+		tempPassage.innerHTML = ""; //Element needs to be cleared out before we can begin.
+		var tempHeight;
+		var i = 0;
+		var heightRegEx = /.*(\r\n|\n)/g;
+		var itemArr = original.match(heightRegEx);
+		
+		//We need to build the "#passageConstruction" div line by line, test the height, and add pages based on that height. To do that, we need to make the tempPassage workable.
+		tempPassage.style.position = "absolute";
+		tempPassage.style.visibility = "hidden";
+		tempPassage.style.display = "block";
+
+		for (i=0; i < itemArr.length; i++) {
+			$("passageConstruction").append(itemArr[i]);
+			tempHeight = tempPassage.clientHeight;	
+			
+		}
+		console.log("temporary object's height is: "+ tempHeight);
+		tempPassage.style.position = "absolute";
+		tempPassage.style.visibility = "";
+		tempPassage.style.display = "hidden";
+		window.testVar = itemArr;
+		return original;
+	}
 });
