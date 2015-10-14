@@ -66,7 +66,6 @@ function Story (el)
 
 		p[id] = new Passage(id, $t.attr('name'), (tags !== '' && tags !== undefined) ? tags.split(' ') : [], $t.html());
 	});
-	
 	/*
 	 An array of user-specific scripts to run when the story is begun. @property userScripts @type Array
 	*/

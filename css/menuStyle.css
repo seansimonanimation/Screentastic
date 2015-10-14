@@ -12,6 +12,7 @@
 	line-height: 50px;
 	cursor: pointer;
 	font-size: 500%;
+	z-index: 6;
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
@@ -59,14 +60,15 @@
 }
 #menuItem {
 	font-family: 'Screentastic_Icons';
-	font-size: 600%;
-	color: #555;
+	font-size: 400%;
+	color: #DDD;
+	line-height: 100px;
 	position: relative;
 	display: inline-block;
 	margin:0 auto;
 	top: -1px;
 	height: 98%;
-	width: 100px;c
+	width: 100px;
 	background-color:#EEE;
 	border: solid;
 	border-color: #999;

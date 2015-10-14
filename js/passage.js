@@ -151,29 +151,62 @@ _.extend(Passage.prototype, {
 		}
 		return original;
 	},
-	_pageParser: function(original) { //This function automatically figures out how many pages that a passage uses and generates pages accordingly.
+	_pageParser: function(original) { 
+		/*This function automatically figures out how many pages that a passage uses and generates pages accordingly.
+			*****KNOWN ISSUE*****
+			The page parser can really only guess at what the final result will be, and it seems to find an arbitrary place
+			to put the pagemaking code each time. I need to figure out an exact way for the parser to guess accurately.
+			Until then, it works, just the distances between the pages and here the pages actually split seem arbitrary to the
+			end user.
+		*/
 		var tempPassage = document.getElementById("passageConstruction");
 		tempPassage.innerHTML = ""; //Element needs to be cleared out before we can begin.
-		var tempHeight;
+		var tempHeight = 0;
 		var i = 0;
-		var heightRegEx = /.*(\r\n|\n)/g;
+		var heightRegEx = /.*(\r\n|\n)?/g;
 		var itemArr = original.match(heightRegEx);
-		
-		//We need to build the "#passageConstruction" div line by line, test the height, and add pages based on that height. To do that, we need to make the tempPassage workable.
+		var heightSubtractor = 0;
+		var pageCounter = 1;
+		var result = '';
+		var pageDistance = [];
+		//We need to build the "#passageConstruction" div line by line, test the height, and add pages based on that height. To do that, we need to make the tempPassage workable. AKA not display: hidden;
 		tempPassage.style.position = "absolute";
-		tempPassage.style.visibility = "hidden";
+		tempPassage.style.visibility = "visible";
 		tempPassage.style.display = "block";
-
+		tempPassage.style.width = "672px";
+		tempPassage.style.left = "0px";
+		tempPassage.style.top = "0px";
 		for (i=0; i < itemArr.length; i++) {
-			$("passageConstruction").append(itemArr[i]);
+			$("#passageConstruction").append(itemArr[i]);
 			tempHeight = tempPassage.clientHeight;	
-			
+			if (tempHeight > 900) {
+				pageDistance = 972 - tempHeight + 82;
+				if (window.sketchMode === false) {
+					itemArr[i-1] = itemArr[i-1].substring(0,itemArr[i-1].length -1) + "</div><br /><div id=\"page\" style=\"position:relative;left:-73px;top:" + pageDistance + "px;\">\n";
+					
+					console.log(itemArr[i-1]);
+					tempPassage.innerHTML = ""; //Element needs to be cleared so we can start fresh with the new div.
+					$("#passageConstruction").append(itemArr[i]);
+				} else {
+					itemArr[i-1] = itemArr[i-1].substring(0,itemArr[i-1].length -1) + "</ul></div><br /><div id=\"page\"style=\"position:relative;left:-73px;top:" + pageDistance + "px;\"><ul>\n";
+					console.log(itemArr[i-1]);
+					tempPassage.innerHTML = ""; //Element needs to be cleared so we can start fresh with the new div.
+					$("#passageConstruction").append(itemArr[i]);
+				}
+				pageCounter = pageCounter + 1;
+			}
+
 		}
-		console.log("temporary object's height is: "+ tempHeight);
-		tempPassage.style.position = "absolute";
-		tempPassage.style.visibility = "";
-		tempPassage.style.display = "hidden";
-		window.testVar = itemArr;
-		return original;
+		console.log(pageDistance);
+						//var tempPassage = document.getElementById("passageConstruction");
+		
+		i=0;
+		for (i=0; i<itemArr.length; i++) {
+			result = result + itemArr[i];		
+		} 
+		tempPassage.style.visibility = "hidden";
+		tempPassage.style.display = "none";
+		$(window).scrollTop(0); //it seems to work better here than anywhere else... go figure.
+		return result;
 	}
 });

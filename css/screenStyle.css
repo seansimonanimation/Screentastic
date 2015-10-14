@@ -2,7 +2,6 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 
 #page {
 	background: #FFF;
-	margin: auto;
 	height: 972px;
 	width: 672px;
 	border-style: solid;
@@ -10,14 +9,25 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 	padding: 72px;
 	z-index: 5;
 }
+.pageDefaultPos {
+	position: relative;
+	margin: auto;
+
+}
+
+.addlPagePos {
+	position: relative;
+	top: 150px;
+	left: -73px;
+}
+
 #passageConstruction {
 	position: absolute;
 	margin: auto;
-	width: 672px;
-	top: -10px;
 	display: none;
 	z-index: 1;
 }
+
 #schCont {
 	position: relative;
 	display: block;
@@ -71,12 +81,10 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 	width: 600px;
 }
 
+
+
 #pageNumberCont {
 /*Future Feature: Page numbers that reflect what'll be seen on the PDF.*/
-}
-
-#menuBar {
-/*Future Feature: Hidden menu bar that unhides when you click the thingy!*/
 }
 
 /*The things below this line are for funsies and are not actually important to making things industry standard*/
@@ -109,5 +117,3 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 .bothole {
 	margin-top: 400px;
 }
-
-
