@@ -56,3 +56,17 @@ Known bugs:
 Thoughts:
 --I should put in visual themes. That'd be fun. As long as what's on the page isn't changed, we can do whatever!
 --base64 is wonderful.
+
+v0.3.0
+------
+Changes:
+Added a bunch of new features
+	automatic page parsing: If your story's passage runs beyond a page, don't worry... Screentastic will automatically add pages as needed.
+	Sketch Mode: An exciting new feature that allows you to quickly get your ideas out there.
+	The Menu: The menu items are not functional yet, but we've now got a menu that you can open/close at will.
+	a bunch of changes under the hood: A lot of the passage handling passage.js has been restructured.
+	Automatic scrolling to the top: Screentastic now drops you off at the top of the page whenever you click a link.
+
+known issues:
+	The page parser's spacing for adding new pages is not always consistent.
+	The links in the menu don't work. Don't worry, they just haven't been programmed yet. They should be done save for the PDF items by 0.4.0.
