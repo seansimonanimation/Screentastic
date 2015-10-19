@@ -18,8 +18,8 @@
 	<span id="menuItem" class="forwardButton" onclick="forwardFunc()">b</span>
 	<span id="menuItem" class="quickSaveButton" onclick="quickSaveFunc()">e</span>
 	<span id="menuItem" class="quickLoadButton" onclick="quickLoadFunc()">f</span>
-	<span id="menuItem" class="makePDFButton" onclick="PDFFunc()">h</span>
-	<span id="menuItem" class="makePrintButton" onclick="printFunc()">d</span>
+	<span id="menuItem" class="makePDFButton" onclick="var print=false;PDFFunc(print);">h</span>
+	<span id="menuItem" class="makePrintButton" onclick="var print=true;PDFFunc(print);">d</span>
 </div>
 
 <div id="menuButton" class="menuAwayButton" onclick="menuButtonFunc()">^</div>
@@ -37,8 +37,12 @@
 <script src="lib/underscore.js"></script>
 <script src="lib/marked.js"></script>
 <script src="lib/lz-string.js"></script>
+<script src="lib/Blob.js"></script>
+<script srx="lib/fileSaver.min.js"</script>
 
 <script src="js/menuJS.js"></script>
+<script src="js/pdfSection.js"></script>
+<script src="js/makePDF.js"></script>
 <script src="js/passage.js"></script>
 <script src="js/story.js"></script>
 <script src="js/init.js"></script>

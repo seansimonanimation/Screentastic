@@ -27,12 +27,16 @@ function menuButtonFunc() {
 }
 
 
-function printFunc() {
-	alert("Sorry, printing isn't implemented yet... :(");
-}
 
-function PDFFunc() {
-	alert("Sorry, PDFs aren't implemented yet... :(");
+
+function PDFFunc(print) { //printing is not implemented yet, but some infrastructure for it is.
+	window.PDF = new PDFdoc($(('tw-storydata')));
+	if (print = true) {
+		window.PDF.make();
+	} else {
+		window.PDF.make();
+	}
+
 }
 
 function quickSaveFunc() {

@@ -195,10 +195,7 @@ _.extend(Passage.prototype, {
 				}
 				pageCounter = pageCounter + 1;
 			}
-
 		}
-		console.log(pageDistance);
-						//var tempPassage = document.getElementById("passageConstruction");
 		
 		i=0;
 		for (i=0; i<itemArr.length; i++) {

@@ -170,7 +170,7 @@ _.extend(Story.prototype,
 
 		$.event.trigger('startstory', { story: this });
 
-		// try to restore based on the window hash if possible	
+		// try to restore based on the window hash if possible
 
 		if (window.location.hash === '' || ! this.restore(window.location.hash.replace('#', '')))
 		{
