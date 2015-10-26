@@ -27,7 +27,12 @@ gulp.task('jshint', function()
 				marked: true,
 				LZString: true,
 				Passage: true,
-				Story: true
+				Story: true,
+				makePDF: true,
+				saveAs: true,
+				jsPDF: true,
+				Blob: true,
+				storyData: true
 			},
 			globalstrict: true, // OK to use 'use strict'; instead of function
 			"-W032": true, // Unnecessary semicolon

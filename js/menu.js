@@ -7,6 +7,7 @@ The Save to PDF button
 The Print button.
 */
 'use strict';
+
 function menuButtonFunc() {
 
 	var menuButtonEl = document.getElementById("menuButton");
@@ -26,15 +27,12 @@ function menuButtonFunc() {
 
 }
 
-
-
-
 function PDFFunc(print) { //printing is not implemented yet, but some infrastructure for it is.
-	window.PDF = new PDFdoc($(('tw-storydata')));
-	if (print = true) {
-		window.PDF.make();
+	if (print === true) {
+		alert("Sorry, Printing isn't implemented yet... :(");
+		//makePDF(true);
 	} else {
-		window.PDF.make();
+		makePDF(false);
 	}
 
 }
@@ -54,3 +52,8 @@ function forwardFunc() {
 function backFunc() {
 	alert("Sorry, Backward movement through passages isn't implemented yet... :(");
 }
+
+
+
+
+

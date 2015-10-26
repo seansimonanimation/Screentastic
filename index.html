@@ -11,6 +11,22 @@
 <link rel="stylesheet" href="css/screenStyle.css">
 <link rel="stylesheet" href="css/menuStyle.css">
 <!-- endbuild -->
+<!-- build:js min.js -->
+<script src="lib/jquery.js"></script>
+<script src="lib/underscore.js"></script>
+<script src="lib/marked.js"></script>
+<script src="lib/lz-string.js"></script>
+<script src="lib/jspdf.js"></script>
+<script src="lib/Blob.js"></script>
+<script src="lib/fileSaver.min.js"</script>
+
+
+<script src="js/menu.js"></script>
+<script src="js/makepdf.js"></script>
+<script src="js/passage.js"></script>
+<script src="js/story.js"></script>
+<script src="js/init.js"></script>
+<!-- endbuild -->
 </head>
 <body>
 
@@ -19,8 +35,8 @@
 	<span id="menuItem" class="forwardButton" onclick="forwardFunc()">b</span>
 	<span id="menuItem" class="quickSaveButton" onclick="quickSaveFunc()">e</span>
 	<span id="menuItem" class="quickLoadButton" onclick="quickLoadFunc()">f</span>
-	<span id="menuItem" class="makePDFButton" onclick="PDFFunc()">h</span>
-	<span id="menuItem" class="makePrintButton" onclick="printFunc()">d</span>
+	<span id="menuItem" class="makePDFButton" onclick="var print=false;PDFFunc(print);">h</span>
+	<span id="menuItem" class="makePrintButton" onclick="var print=true;PDFFunc(print);">d</span>
 </div>
 
 <div id="menuButton" class="menuAwayButton" onclick="menuButtonFunc()">^</div>
@@ -118,17 +134,7 @@ The End.
 <div id="passageConstruction">derp<br /><br />derp</div>
 
 
-<!-- build:js min.js -->
-<script src="lib/jquery.js"></script>
-<script src="lib/underscore.js"></script>
-<script src="lib/marked.js"></script>
-<script src="lib/lz-string.js"></script>
 
-<script src="js/menuJS.js"></script>
-<script src="js/passage.js"></script>
-<script src="js/story.js"></script>
-<script src="js/init.js"></script>
-<!-- endbuild -->
 
 </body>
 </html>

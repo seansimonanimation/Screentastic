@@ -1,171 +1,141 @@
-/*
- An object representing the entire story. When called, an instance of this class will be available at `window.story`. @class Story @constructor. stolen from Chris Klimas, with some modifications.
-*/
+//a dumb module that makes PDF documents from existing story stuff.
 
 'use strict';
 
-function PDF(el) {
 
-// set up basic properties
+function makePDF(print) {
 
-	this.el = el;
+	var allContent = window.storyData[0];
+	var a = allContent;
+	var i = 0;
+	var c = 0;
+	var s = 0;
+	var sectionName = '';
+	var pasid=0;
+	var tag='';
+	var content = '';
+	var sections = []; //an array containing objects containg all sections.
 	/*
-	 The name of the story. @property name @type String @readonly
+	proper format:
+	[{name:"start",pid:1,tags:"",content:"stuff"},{name:"page2",pid:2,tags:"",content:"stuff"}] and so on and so forth...
 	*/
-	this.name = el.attr('name');
-	/*
-	 The ID of the first passage to be displayed. @property startPassage @type Number @readonly
-	*/
-	this.startPassage = parseInt(el.attr('startnode'));
-	/*
-	 The program that created this story. @property creator @type String @readonly
-	*/
-	this.creator = el.attr('creator');
-	/*
-	 The version of the program used to create this story. @property creatorVersion @type String @readOnly
-	*/
-	this.creatorVersion = el.attr('creator-version');
-	/*
-	 If set to true, then any JavaScript errors are ignored -- normally, play would end with a message shown to the user.  @property ignoreErrors @type Boolean
-	*/
-	this.ignoreErrors = false;
-	/*
-	 The message shown to users when there is an error and ignoreErrors is not true. Any %s in the message will be interpolated as the actual error messsage. @property errorMessage @type String
-	*/
-	this.errorMessage = '\u26a0 %s';
-	// create passage objects
-	/*
-	 An array of all passages, indexed by ID. @property passages @type Array
-	 For Print mode, let's call them "Sections", just to help mentally separate them from onscreen passages. This section helps make the translation, as well as manages the data dump.
-	*/
-	this.sections = [];
-	var s = this.sections;
-	el.children('tw-passagedata').each(function (el){
-		var $t = $(this);
-		var id = parseInt($t.attr('pid'));
-		var tags = $t.attr('tags');
+	for (i=2; i < (a.childElementCount); i++) {
+		sectionName = a.children[i].attributes.name.value;
+		pasid = parseInt(a.children[i].attributes.pid.value);
+		tag = a.children[i].attributes.tags.value;
+		content = _.unescape(a.children[i].innerHTML);
+		content = content.replace(/\/\*.*\*\//g, ''); //removes //comments
+		content = content.replace(/^\/\/.*(\r\n?|\n)/g, ''); // to avoid clashes with URLs, lines must start with these
+		sections[i-2] = {name:sectionName, pid: pasid, tags: tag, source: content};
+	}
 
-		s[id] = new Section(id, $t.attr('name'), (tags !== '' && tags !== undefined) ? tags.split(' ') : [], $t.html());
-	});
-	/*
-	 Screentastic has no special place for user scripts. All styling is already laid out by the WGA.
-	Instead, we'll set up the PDF document in PDF space.
-	*/
+	for (i=0; i<sections.length; i++) { //parse the text into html-readable segments.
+		if (window.sketchMode === false) {
+			sections[i] = pdfProductionparser(sections[i]);
+		} else {
+			sections[i] = pdfSketchParser(sections[i]);
+		}
+	}
+	var doc = new jsPDF();
+	s = 0;
+	for (i=0; i < sections.length; i++) {
+		for (s=0; s < sections[i].source.length; s++) {
+			sections[i].source[s] = sections[i].source[s].replace(/(\r\n?|\n)/g, '');
+			eval(sections[i].source[s]);
+		}
+	}
+	var rawdata = doc.output();
+	console.log(rawdata);
+	var len = rawdata.length,
+	ab = new ArrayBuffer(len),
+	u8 = new Uint8Array(ab);
 
-	//A Variable telling us whether or not we have a title page.
-	this.titlePage = false;
+	while(len--) u8[len] = rawdata.charCodeAt(len);
+	var blob = new Blob([ab], { type : "application/pdf" });
+	saveAs(blob, window.story.name + ".pdf");
+
+
+	//var pdfBlob = new Blob(
+		//[pdfData],
+		//{type: 'application/pdf', encoding: 'raw'}
+	//);
+	//saveAs(pdfBlob, window.story.name + ".pdf");
+}
+
+
+
+function pdfProductionparser (Section) {
+
 
 }
 
-_.extend(PDF.prototype, {
-	/*
-	 Begins making the PDF.
 
-	 @method make
-	*/
+function pdfSketchParser (Section) {
+	var result = '';
+	var tempPassage = document.getElementById("passageConstruction");
+	var unes = Section.source;
+	tempPassage.innerHTML = "";
+	var fromLeft = 27;
+	var fromTop = 25;
+	var tempHeight = 0;
+	var tempWidth = 0; //jsPDF doesn't do autowrap... blech..
+	var i = 0;
+	var s = 0;
+	var heightRegEx = /.*(\r\n|\n)?/g;
+	var itemArr = unes.match(heightRegEx);
+	var heightSubtractor = 0;
+	var pageCounter = 1;
+	var pageDistance = [];
+	var oldstring = ''; //we're gonna abuse this var here.
+	var newstring = '';
+	var pageMarker = [];
+	tempPassage.style.position = "absolute";
+	tempPassage.style.visibility = "visible";
+	tempPassage.style.display = "block";
+	tempPassage.style.left = "0px";
+	tempPassage.style.top = "0px";
+	for (i=0; i<itemArr.length; i++) {
+		for (s=0; s<itemArr[i].length; s++) {
+			$("#passageConstruction").append(itemArr[i][s]);
+			newstring = newstring + itemArr[i][s];
+			tempWidth = tempPassage.clientWidth;
 
-	make: function() {
-		// set up error handler
-
-		window.onerror = function (message, url, line){
-			if (! this.errorMessage || typeof(this.errorMessage) != 'string')
-				this.errorMessage = PDF.prototype.errorMessage;
-
-			if (! this.ignoreErrors)
-			{
-				if (url)
-				{
-					message += ' (' + url;
-
-					if (line)
-						message += ': ' + line;
-
-					message += ')';
-				}
-
-				alert('%s', message);	
-			}
-		}.bind(this);
-		//begin building the PDF document.
-		var storyData = window.PDF.sections;
-		var pdfData = this.buildPDF(storyData);
-		var pdfBlob = new Blob(
-			[pdfData],
-			{type: 'application/pdf', encoding: 'raw'}
-		);
-		saveAs(pdfBlob, window.story.name + ".pdf");
-
-	},
-	/*
-	 Returns the Section object corresponding to either an ID or name. If none exists, then it returns null. @method passage @param idOrName {String or Number} ID or name of the passage @return Passage object or null
-	*/
-	section: function (idOrName)
-	{
-		if (_.isNumber(idOrName))
-			return this.passages[idOrName];
-		else if (_.isString(idOrName))
-			return _.findWhere(this.passages, { name: idOrName });
-	},
-
-
-	//Builds the PDF Data so that it can be saved. Returns a string.
-	buildPDF: function (storyData) {
-		var pdfSecs = $.extend(true, [], PDF.sections);
-		var doc = new jsPDF();
-		// If the "titlePage" Passage exists, let's put that in front. That's our title page.
-		var i = 1;
-		var s = 0; //Renderer's gonna generate nested arrays. Need to parse that properly.
-		var sourceArray = [];
-
-
-		if (window.sketchMode === false) { //We're in production mode!
-			for (i = 1; i < pdfSecs.length - 1; i++) {
-				if (pdfSecs[i].name == "titlePage") {
-					this.titlePage = true;
-					pdfSecs[0] = pdfSecs[i];
-					pdfSecs.slice(i,1);
-				}
+			if (tempWidth > 672) {
+				newstring = newstring + "\r\n";
+				tempPassage.innerHTML = "";
 			}
 
-			// Now for the fun bit. This section of code here takes the source from each passage and converts it to a jsPDF execution.
-		
-			for (i = 0; i < pdfSecs.length ; i++) {
-				if (pdfSecs[i].name == "titlePage") {
-					sourceArray[i] = Section.titlePageRender(pdfSecs[i]);
-					//format: 
-				} else {
-					sourceArray[i] = Section.pageRender(pdfSecs[i]);
-				}
-			}
-		} else { //We're in sketch mode now!
-			for (i = 1; i < pdfSecs.length - 1; i++) {
-				if (pdfSecs[i].name == "titlePage") {
-					this.titlePage = true;
-					pdfSecs.slice(i,1); //There's no need for a title page in sketch mode.
-				}
-			}
-			for (i = 0; i < pdfSecs.length ; i++) {
-				sourceArray[i] = Section.pageRender(pdfSecs[i]);
-			}
 		}
-		//now run each line of the sourceArray var through eval();
-		for (i=0; i<sourceArray[i].length; i++) {
-			for (s=0; sourceArray[i][s].length; s++) {
-				eval(sourceArray[i][s]); //evaluate that string y'awll!
-			}
+	}
+	itemArr[i] = newstring;
+	tempPassage.innerHTML = oldstring + newstring;
+	oldstring = oldstring + newstring;
+	tempHeight = tempPassage.clientHeight;	
+	if (tempHeight > 900) {
+		pageMarker = pageMarker.push(i);
+		oldstring = '';
+		newstring = '';
+	}
+	tempPassage.innerHTML = '';
+	//Let's format this properly now.
+	tempHeight = 0;
+	for (i=0; i<itemArr.length; i++) {
+		for (s=0; s<pageMarker.length; s++) {
+			if (i == pageMarker[s]) {
+				fromTop = 25;
+			} 
 		}
-		return doc;
+		tempPassage.innerHTML = itemArr[i];
+		itemArr[i] = "doc.circle("+ (fromLeft - 3) + "," + fromTop + ",2,\"F\");doc.text(" + fromLeft + "," + fromTop + ",\"" + itemArr[i] + "\");";
+		tempHeight = tempPassage.clientHeight;
+		fromTop = tempHeight + fromTop;
+	}
 
-	}, //shouldn't be a need for this bit, but I feel like I missed something, so I'm keeping it in.
-	render: function (idOrName)
-	{
-		var section = this.section(idOrName);
+	//Now to put in the page breaks.
+	for (i=0; i<pageMarker.length; i++) {
+		itemArr.splice(pageMarker[i],1,"doc.addPage();");
+	}
 
-		if (! section)
-			throw new Error('There is no passage with the ID or name ' + idOrName);
-
-		return section.render();
-	},
-
-});
-
+	Section.source = itemArr;
+	return Section;
+}
