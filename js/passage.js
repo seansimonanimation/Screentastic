@@ -32,7 +32,7 @@ _.extend(Passage.prototype, {
 	This is where the magic happens.*/
 	render: function() {
 		var result = '';
-		var unes = _.template(_.unescape(this.source), { s: window.story.state, $: this._readyFunc }); //unes is the unescaped source.
+		var unes = _.unescape(this.source); //unes is the unescaped source.
 		unes = unes.replace(/\/\*.*\*\//g, '');
 		// Remove // comments
 		// to avoid clashes with URLs, lines must start with these

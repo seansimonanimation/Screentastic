@@ -29,9 +29,7 @@ gulp.task('jshint', function()
 				Passage: true,
 				Story: true,
 				makePDF: true,
-				saveAs: true,
-				jsPDF: true,
-				Blob: true,
+				pdfMake: true,
 				storyData: true
 			},
 			globalstrict: true, // OK to use 'use strict'; instead of function
