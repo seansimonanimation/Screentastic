@@ -29,8 +29,8 @@ function menuButtonFunc() {
 
 function PDFFunc(print) { //printing is not implemented yet, but some infrastructure for it is.
 	if (print === true) {
-		alert("Sorry, Printing isn't implemented yet... :(");
-		//makePDF(true);
+		//alert("Sorry, Printing isn't implemented yet... :(");
+		makePDF(true);
 	} else {
 		makePDF(false);
 	}

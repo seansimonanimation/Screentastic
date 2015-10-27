@@ -38,25 +38,45 @@ function makePDF(print) {
 	}
 
 	var pdfDocDef = {
-		content: []
-		};
+		content: [],
+		defaultStyle: { font: 'CourierPrime' },
+		//styles: {
+			//sketchItem : {
+				//margin: [ 0,0,-25,0 ]
+			//}
+		//},
+		pageMargins: [72,72],
+		pageSize: 'LETTER',
+	};
 
 	for (i=0; i<sections.length; i++) { //parse the text into html-readable segments because SECTIONS IS MADE NOW! YAY!
 		if (window.sketchMode === true) {
 			sections[i] = pdfSketchParser(sections[i]);
+			pdfDocDef.content.push({ul : sections[i].source, style: 'sketch'});
+			//pdfDocDef.content[i].style = "sketchItem";
+			if (i != (sections.length - 1)) {
+				pdfDocDef.content[i].pageBreak = "after";
+			}
+		} else {
+			sections[i] = pdfProductionParser(sections[i]);
 			pdfDocDef.content.push({ul : sections[i].source});
 			if (i != (sections.length - 1)) {
 				pdfDocDef.content[i].pageBreak = "after";
 			}
+
 		}
 	}
-	window.pdd = pdfDocDef
-	pdfMake.createPdf(pdfDocDef).open();  //USE THIS ONLY WHEN READY FOR PRODUCTION
-
+	pdfMake.fonts = {CourierPrime: { normal: 'CourierPrime.ttf' }};
+	if (print === true) {
+		try {
+			pdfMake.createPdf(pdfDocDef).print();  //USE THIS ONLY WHEN READY FOR PRODUCTION
+		} catch(e) { alert("This feature is only available in Chrome at this time")}
+		
+	} else {
+		pdfMake.createPdf(pdfDocDef).open();  //USE THIS ONLY WHEN READY FOR PRODUCTION
+	}
 
 }
-
-
 
 function pdfProductionparser (Section) {
 
@@ -69,7 +89,7 @@ function pdfSketchParser (Section) {
 	var i = 0;
 	var s = 0;
 	var heightRegEx = /.*(\r\n|\n)?/g;
-	unes = unes.replace(/sketch>>(\n|\r\n)?/g, '');
+	unes = unes.replace(/sketch>>.*(\n|\r\n)?/g, '');
 	var itemArr = unes.match(heightRegEx);
 	Section.source = itemArr;
 	return Section;
