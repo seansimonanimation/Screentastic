@@ -40,11 +40,20 @@ function makePDF(print) {
 	var pdfDocDef = {
 		content: [],
 		defaultStyle: { font: 'CourierPrime' },
-		//styles: {
+		styles: {
 			//sketchItem : {
 				//margin: [ 0,0,-25,0 ]
 			//}
-		//},
+			sch: {margin: [0, 10, 0, 0]},
+			tra: {
+				alignment: "right",
+				margin: [0,10, 0, 0]
+			},
+			cha: {margin: [100, 0, -50, 0]},
+			dia: {margin: [50, 0, -50, 0]},
+			act: {margin: [0, 10, 0, 0]}
+
+		},
 		pageMargins: [72,72],
 		pageSize: 'LETTER',
 	};
@@ -52,14 +61,15 @@ function makePDF(print) {
 	for (i=0; i<sections.length; i++) { //parse the text into html-readable segments because SECTIONS IS MADE NOW! YAY!
 		if (window.sketchMode === true) {
 			sections[i] = pdfSketchParser(sections[i]);
-			pdfDocDef.content.push({ul : sections[i].source, style: 'sketch'});
+			pdfDocDef.content.push({ul : sections[i].source, style: 'sketch'}); //In sketch mode, it's a simple unordered list.
 			//pdfDocDef.content[i].style = "sketchItem";
 			if (i != (sections.length - 1)) {
 				pdfDocDef.content[i].pageBreak = "after";
 			}
 		} else {
 			sections[i] = pdfProductionParser(sections[i]);
-			pdfDocDef.content.push({ul : sections[i].source});
+			//In production mode, each item is its own object with its own style and placement needs.
+			pdfDocDef.content.push(sections[i].source);
 			if (i != (sections.length - 1)) {
 				pdfDocDef.content[i].pageBreak = "after";
 			}
@@ -70,7 +80,7 @@ function makePDF(print) {
 	if (print === true) {
 		try {
 			pdfMake.createPdf(pdfDocDef).print();  //USE THIS ONLY WHEN READY FOR PRODUCTION
-		} catch(e) { alert("This feature is only available in Chrome at this time")}
+		} catch(e) { alert("This feature is only available in Chrome at this time");}
 		
 	} else {
 		pdfMake.createPdf(pdfDocDef).open();  //USE THIS ONLY WHEN READY FOR PRODUCTION
@@ -78,9 +88,63 @@ function makePDF(print) {
 
 }
 
-function pdfProductionparser (Section) {
+function pdfProductionParser (Section) {
+	var unes = _.unescape(Section); //unes is the unescaped source.
+	unes = unes.replace(/\/\*.*\*\//g, '');
+	// Remove // comments
+	// to avoid clashes with URLs, lines must start with these
+	unes = unes.replace(/^\/\/.*(\r\n|\n)?/g, '');
+	var lineRegExp =/\w{3}>>(.+)(\r\n|\n)?/g;
+	var sourceMatches = unes.match(lineRegExp); //returns an array of all line matches where the lines begin with itm>>.
+	var manipstring = '';
+	var lineObj = {};
+	var i;
+	var textExists = true;
+	try {
+		textExists = true;
+		for (i=0; i < sourceMatches.length; i++) {
+			manipstring = sourceMatches[i];
+			var lineType = manipstring.substring(0,3);
+			var lineContent = manipstring.substring(5);
+			switch(lineType) {
+				case "sch":
+					lineContent = lineContent.toUpperCase();
+					break;
+				case "tra":
+					lineContent = lineContent.toUpperCase();
+					break;
+				case "cha":
+					lineContent = lineContent.toUpperCase();
+					break;
+				case "par":
+					//This chunk of code is a smart parenthases parser that makes sure that parenthases are always there.
+					var matches = lineContent.match(/\s?(\()?([^)]*)(\))?$/);
+					switch (matches.length) { 
+						case 1:
+							lineContent = "(" + matches[0] + ")";
+							break;
+						case 2:
+							if (matches[0] == "(") {
+								lineContent = "(" + matches[1] + ")";
+							} else {
+								lineContent = "(" + matches[0] + ")";
+							}
+						break;
 
-
+					}
+				break;
+			}
+			lineObj = {text: lineContent, style: lineType};
+			sourceMatches[i] = lineObj;
+		}
+	} catch(err) {
+		textExists = false;
+	}
+	
+	if (/*linksExist === false &&*/ textExists === false) {	
+		sourceMatches = {text: "This section contains no data."}; //error catching, yay! Also lazy HTML! Yay!
+	}
+	return sourceMatches;
 }
 
 
