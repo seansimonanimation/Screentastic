@@ -34,7 +34,7 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 	margin-left: 69px;
 	width: 600px;
 	text-transform: uppercase;
-	top: 10px;
+	margin-top: 20px;
 }
 
 #traCont {
@@ -44,7 +44,7 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 	width: 600px;
 	text-transform: uppercase;
 	text-align: right;
-	top: 10px;
+	margin-top: 20px;
 }
 
 #chaCont {
@@ -53,7 +53,7 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 	margin-left: 288px;
 	width: 250px;
 	text-transform: uppercase;
-	top: 10px;
+	margin-top: 20px;
 }
 
 #diaCont {
@@ -68,7 +68,7 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 	display: block;
 	margin-left: 69px;
 	width: 600px;
-	top: 10px;
+	margin-top: 20px;
 }
 
 #parCont {
@@ -83,7 +83,7 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 	display: block;
 	margin-left: 69px;
 	width: 600px;
-	top: 10px;
+	margin-top: 20px;
 }
 
 

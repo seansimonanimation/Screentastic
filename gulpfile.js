@@ -65,6 +65,7 @@ gulp.task('bake', function()
 		.pipe(gulp.dest('./'));
 });
 
+
 // bake for release replaces includes with actual placeholders
 // and minifies the whole shebang into a single file in build/,
 // which our build staging area
@@ -117,6 +118,8 @@ gulp.task('release', ['bake:release', 'copy'], function (cb)
 });
 
 gulp.task('default', ['jshint', 'bake', 'doc']);
+
+
 
 gulp.task('watch', function()
 {

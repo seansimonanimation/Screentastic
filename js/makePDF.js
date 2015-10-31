@@ -13,6 +13,7 @@
 
 function makePDF(print) {
 
+	
 	var allContent = window.storyData[0];
 	var a = allContent;
 	var i = 0;
@@ -57,7 +58,7 @@ function makePDF(print) {
 		pageMargins: [72,72],
 		pageSize: 'LETTER',
 	};
-
+	var runningTotal = 0;
 	for (i=0; i<sections.length; i++) { //parse the text into html-readable segments because SECTIONS IS MADE NOW! YAY!
 		if (window.sketchMode === true) {
 			sections[i] = pdfSketchParser(sections[i]);
@@ -65,18 +66,29 @@ function makePDF(print) {
 			//pdfDocDef.content[i].style = "sketchItem";
 			if (i != (sections.length - 1)) {
 				pdfDocDef.content[i].pageBreak = "after";
+
 			}
 		} else {
 			sections[i] = pdfProductionParser(sections[i]);
 			//In production mode, each item is its own object with its own style and placement needs.
-			pdfDocDef.content.push(sections[i].source);
-			if (i != (sections.length - 1)) {
-				pdfDocDef.content[i].pageBreak = "after";
+			for (s=0; s<sections[i].length; s++) {
+				if (sections[i][s].last === true) {
+					sections[i][s].pageBreak = "after";
+					delete sections[i][s].last;
+					console.log(sections[i][s]);
+				} else {
+					delete sections[i][s].last;
+				}
+				pdfDocDef.content.push(sections[i][s]);
 			}
-
 		}
 	}
+	delete pdfDocDef.content[sections.length - 1].pagebreak;
+	var d = sections[sections.length-1]
+	delete d[d.length-1].pageBreak;
+	//console.log(pdfDocDef);
 	pdfMake.fonts = {CourierPrime: { normal: 'CourierPrime.ttf' }};
+	
 	if (print === true) {
 		try {
 			pdfMake.createPdf(pdfDocDef).print();  //USE THIS ONLY WHEN READY FOR PRODUCTION
@@ -89,17 +101,19 @@ function makePDF(print) {
 }
 
 function pdfProductionParser (Section) {
-	var unes = _.unescape(Section); //unes is the unescaped source.
+	var unes = _.unescape(Section.source); //unes is the unescaped source.
+
 	unes = unes.replace(/\/\*.*\*\//g, '');
 	// Remove // comments
 	// to avoid clashes with URLs, lines must start with these
 	unes = unes.replace(/^\/\/.*(\r\n|\n)?/g, '');
-	var lineRegExp =/\w{3}>>(.+)(\r\n|\n)?/g;
+	var lineRegExp =/\w{3}>>(.*)(\r\n|\n)?/g;
 	var sourceMatches = unes.match(lineRegExp); //returns an array of all line matches where the lines begin with itm>>.
 	var manipstring = '';
 	var lineObj = {};
 	var i;
 	var textExists = true;
+	var lastItem;
 	try {
 		textExists = true;
 		for (i=0; i < sourceMatches.length; i++) {
@@ -134,14 +148,18 @@ function pdfProductionParser (Section) {
 					}
 				break;
 			}
-			lineObj = {text: lineContent, style: lineType};
+			if (i == (sourceMatches.length - 1)) {
+				lastItem = true;
+			} else {
+				lastItem = false;
+			}	
+			lineObj = {text: lineContent, style: lineType, last : lastItem};
 			sourceMatches[i] = lineObj;
 		}
 	} catch(err) {
 		textExists = false;
 	}
-	
-	if (/*linksExist === false &&*/ textExists === false) {	
+	if (textExists === false) {	
 		sourceMatches = {text: "This section contains no data."}; //error catching, yay! Also lazy HTML! Yay!
 	}
 	return sourceMatches;

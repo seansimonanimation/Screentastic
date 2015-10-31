@@ -75,7 +75,7 @@ _.extend(Passage.prototype, {
 		}
 	},
 	_formatMachine: function(original){
-		var lineRegExp =/\w{3}>>(.+)(\r\n|\n)/g;
+		var lineRegExp =/\w{3}>>(.+)(\r\n|\n)?/g;
 		var sourceMatches = original.match(lineRegExp); //returns an array of all line matches where the lines begin with itm>>.
 		var newSourceMatches = [];
 		var manipstring = '';
@@ -183,8 +183,6 @@ _.extend(Passage.prototype, {
 				pageDistance = 972 - tempHeight + 82;
 				if (window.sketchMode === false) {
 					itemArr[i-1] = itemArr[i-1].substring(0,itemArr[i-1].length -1) + "</div><br /><div id=\"page\" style=\"position:relative;left:-73px;top:" + pageDistance + "px;\">\n";
-					
-					console.log(itemArr[i-1]);
 					tempPassage.innerHTML = ""; //Element needs to be cleared so we can start fresh with the new div.
 					$("#passageConstruction").append(itemArr[i]);
 				} else {
