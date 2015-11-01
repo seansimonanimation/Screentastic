@@ -2,11 +2,7 @@
 
 'use strict';
 
- var docDefinition = {content: ['This is a standard paragraph, using default style',{ text: 'This paragraph will have a bigger font', fontSize: 15 },{text: ['This paragraph is defined as an array of elements to make it possible to ',{ text: 'restyle part of it and make it bigger ', fontSize: 15 },'than the rest.']}]};
-
-
-
-
+ //var docDefinition = {content: ['This is a standard paragraph, using default style',{ text: 'This paragraph will have a bigger font', fontSize: 15 },{text: ['This paragraph is defined as an array of elements to make it possible to ',{ text: 'restyle part of it and make it bigger ', fontSize: 15 },'than the rest.']}]};
 
 
 
@@ -50,8 +46,8 @@ function makePDF(print) {
 				alignment: "right",
 				margin: [0,10, 0, 0]
 			},
-			cha: {margin: [100, 0, -50, 0]},
-			dia: {margin: [50, 0, -50, 0]},
+			cha: {margin: [190, 10, 144, 0]},
+			dia: {margin: [110, 0, 110, 0]},
 			act: {margin: [0, 10, 0, 0]}
 
 		},
