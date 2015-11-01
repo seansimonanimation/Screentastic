@@ -27,7 +27,7 @@ Itm is the kind of object you need displayed at that point. It could be a charac
 content is the actual content of the code block.
 So for instance, if I have this snippet:
 ```
-chr>>Dan the man
+cha>>Dan the man
 dia>>I'm the fucken man!
 ```
 It will show up as if you wrote it with Final Draft, Celtx, or any other screenwriting software.
