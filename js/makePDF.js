@@ -48,10 +48,11 @@ function makePDF(print) {
 			},
 			cha: {margin: [190, 10, 144, 0]},
 			dia: {margin: [110, 0, 110, 0]},
-			act: {margin: [0, 10, 0, 0]}
+			act: {margin: [0, 10, 0, 0]},
+			par: {margin: [144,0,110,0]}
 
 		},
-		pageMargins: [72,72],
+		pageMargins: [70,70],
 		pageSize: 'LETTER',
 	};
 	var runningTotal = 0;
@@ -71,7 +72,6 @@ function makePDF(print) {
 				if (sections[i][s].last === true) {
 					sections[i][s].pageBreak = "after";
 					delete sections[i][s].last;
-					console.log(sections[i][s]);
 				} else {
 					delete sections[i][s].last;
 				}
@@ -80,76 +80,123 @@ function makePDF(print) {
 		}
 	}
 	delete pdfDocDef.content[sections.length - 1].pagebreak;
-	var d = sections[sections.length-1]
+	var d = sections[sections.length-1];
 	delete d[d.length-1].pageBreak;
-	//console.log(pdfDocDef);
+	i = 0;
+	s = 0;
 	pdfMake.fonts = {CourierPrime: { normal: 'CourierPrime.ttf' }};
-	
+	//pdfMake.createPdf(pdfDocDef);
+	/*if (window.sketchMode === true) { //Time to make the links match the page numbers.
+
+
+	} else { //sketchmode's off.
+		for (i=0; i<pdfDocDef.content.length; i++) {
+			if (pdfDocDef.content[i].style == "link") {
+				for (s=0; i<pdfDocDef.content.length; s++) {
+					if (pdfDocDef.content[s].bookmark == pdfDocDef.content[i].target) {
+						pdfDocDef.content[i].text = pdfDocDef.content[i].text + pdfDocDef.content[s].positions[0].pageNumber + "."; 
+					}
+				}
+			}
+		}
+	}
+*/
+
 	if (print === true) {
 		try {
 			pdfMake.createPdf(pdfDocDef).print();  //USE THIS ONLY WHEN READY FOR PRODUCTION
 		} catch(e) { alert("This feature is only available in Chrome at this time");}
 		
 	} else {
-		pdfMake.createPdf(pdfDocDef).open();  //USE THIS ONLY WHEN READY FOR PRODUCTION
+		//pdfMake.createPdf(pdfDocDef).open();  //USE THIS ONLY WHEN READY FOR PRODUCTION
 	}
-
+	console.log(pdfDocDef);
+	window.pdfDocDef = pdfDocDef;
 }
 
 function pdfProductionParser (Section) {
-	var unes = _.unescape(Section.source); //unes is the unescaped source.
 
+	var unes = _.unescape(Section.source); //unes is the unescaped source.
 	unes = unes.replace(/\/\*.*\*\//g, '');
 	// Remove // comments
 	// to avoid clashes with URLs, lines must start with these
 	unes = unes.replace(/^\/\/.*(\r\n|\n)?/g, '');
-	var lineRegExp =/\w{3}>>(.*)(\r\n|\n)?/g;
+	var lineRegExp =/(\w{3}>>(.*)(\r\n|\n)?|\[\[(.*?)\]\](\r\n|\n)?)/g; //both the link grabber and the text grabber combined!
 	var sourceMatches = unes.match(lineRegExp); //returns an array of all line matches where the lines begin with itm>>.
 	var manipstring = '';
 	var lineObj = {};
 	var i;
 	var textExists = true;
 	var lastItem;
+	var lineType;
+	var lineContent;
+	var target;
+	var targetBookmark;
+
 	try {
 		textExists = true;
 		for (i=0; i < sourceMatches.length; i++) {
 			manipstring = sourceMatches[i];
-			var lineType = manipstring.substring(0,3);
-			var lineContent = manipstring.substring(5);
-			switch(lineType) {
-				case "sch":
-					lineContent = lineContent.toUpperCase();
-					break;
-				case "tra":
-					lineContent = lineContent.toUpperCase();
-					break;
-				case "cha":
-					lineContent = lineContent.toUpperCase();
-					break;
-				case "par":
-					//This chunk of code is a smart parenthases parser that makes sure that parenthases are always there.
-					var matches = lineContent.match(/\s?(\()?([^)]*)(\))?$/);
-					switch (matches.length) { 
-						case 1:
-							lineContent = "(" + matches[0] + ")";
-							break;
-						case 2:
-							if (matches[0] == "(") {
-								lineContent = "(" + matches[1] + ")";
-							} else {
-								lineContent = "(" + matches[0] + ")";
-							}
-						break;
-
-					}
-				break;
+			if (manipstring.substring(0,2) == "[[")  { //It's a link!
+				lineType = "link";
+				var barIndex = manipstring.indexOf('|');
+				var endIndex = manipstring.indexOf(']]');
+				targetBookmark = manipstring.slice(barIndex + 1,endIndex);
+				lineContent = manipstring.slice(2, barIndex);
+			} else {
+				lineType = manipstring.substring(0,3);
+				lineContent = manipstring.substring(5);
 			}
+			if (lineType == "sch") {
+				lineContent = lineContent.toUpperCase();
+			} else if (lineType == "tra") {
+				lineContent = lineContent.toUpperCase();
+			} else if (lineType == "cha") {
+				lineContent = lineContent.toUpperCase();
+			} else if (lineType == "par") { //This chunk of code is a smart parenthases parser that makes sure that parenthases are always there.
+				var matches = lineContent.match(/\s?(\()?([^)]*)(\))?$/); 
+				if (matches.length == 1) {
+					lineContent = "(" + lineContent + ")";
+				} else if (matches.length == 2) {
+					if (matches[0] == "(") {
+						lineContent =  lineContent + ")";
+					} else {
+						lineContent = "(" + lineContent;
+					}
+				}
+
+			} else if (lineType == "dia") {
+
+
+			} else if (lineType == "act") {
+
+			} else if (lineType == "link") {
+				lineContent = lineContent + ": Please go to page ";
+			} else { //error
+				lineContent = "(There has been an error in your markup descriptor) " + lineType + ">> " + lineContent;
+			}
+
+
 			if (i == (sourceMatches.length - 1)) {
 				lastItem = true;
 			} else {
 				lastItem = false;
-			}	
-			lineObj = {text: lineContent, style: lineType, last : lastItem};
+			}
+
+
+			if (lineType == "link") {
+				if (i === 0) {
+					lineObj = {text: lineContent, style: lineType, target: targetBookmark, last : lastItem, bookmark: Section.name};	
+				} else {
+					lineObj = {text: lineContent, style: lineType, target: targetBookmark, last : lastItem};
+				}
+			} else {
+				if (i === 0) {
+					lineObj = {text: lineContent, style: lineType, last : lastItem, bookmark: Section.name};	
+				} else {
+					lineObj = {text: lineContent, style: lineType, last : lastItem};
+				}
+			}
 			sourceMatches[i] = lineObj;
 		}
 	} catch(err) {
