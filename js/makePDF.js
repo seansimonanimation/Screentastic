@@ -49,11 +49,15 @@ function makePDF(print) {
 			cha: {margin: [190, 10, 144, 0]},
 			dia: {margin: [110, 0, 110, 0]},
 			act: {margin: [0, 10, 0, 0]},
-			par: {margin: [144,0,110,0]}
-
+			par: {margin: [144,0,110,0]},
+			link: {
+				fontSize: 20,
+				margin: [0,20,0,0]
+			},
 		},
 		pageMargins: [70,70],
 		pageSize: 'LETTER',
+		
 	};
 	var runningTotal = 0;
 	for (i=0; i<sections.length; i++) { //parse the text into html-readable segments because SECTIONS IS MADE NOW! YAY!
@@ -85,33 +89,29 @@ function makePDF(print) {
 	i = 0;
 	s = 0;
 	pdfMake.fonts = {CourierPrime: { normal: 'CourierPrime.ttf' }};
-	//pdfMake.createPdf(pdfDocDef);
-	/*if (window.sketchMode === true) { //Time to make the links match the page numbers.
-
-
+	var docuObj = pdfMake.createPdf(pdfDocDef);
+	docuObj._createDoc(); //_createDoc() method makes essentially does the hard math for ya. This puppy was a BITCH to find. TODO: Downside: destroys the content of #page. Need to fix that.
+	if (window.sketchMode === true) { //Time to make the links match the page numbers.
 	} else { //sketchmode's off.
-		for (i=0; i<pdfDocDef.content.length; i++) {
-			if (pdfDocDef.content[i].style == "link") {
-				for (s=0; i<pdfDocDef.content.length; s++) {
-					if (pdfDocDef.content[s].bookmark == pdfDocDef.content[i].target) {
-						pdfDocDef.content[i].text = pdfDocDef.content[i].text + pdfDocDef.content[s].positions[0].pageNumber + "."; 
+		for (i=0; i<docuObj.docDefinition.content.length; i++) {
+			if (docuObj.docDefinition.content[i].style == "link") {
+				for (s=0; s<docuObj.docDefinition.content.length; s++) {
+					if (docuObj.docDefinition.content[s].bookmark == docuObj.docDefinition.content[i].target) {
+							docuObj.docDefinition.content[i].text = docuObj.docDefinition.content[i].text + docuObj.docDefinition.content[s].positions[0].pageNumber + "."; 
 					}
 				}
 			}
 		}
 	}
-*/
-
 	if (print === true) {
 		try {
 			pdfMake.createPdf(pdfDocDef).print();  //USE THIS ONLY WHEN READY FOR PRODUCTION
 		} catch(e) { alert("This feature is only available in Chrome at this time");}
 		
 	} else {
-		//pdfMake.createPdf(pdfDocDef).open();  //USE THIS ONLY WHEN READY FOR PRODUCTION
+		docuObj.open();
 	}
-	console.log(pdfDocDef);
-	window.pdfDocDef = pdfDocDef;
+	
 }
 
 function pdfProductionParser (Section) {
