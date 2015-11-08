@@ -7,14 +7,13 @@
 
 
 
-function makePDF(print) {
-
-	
+function makePDF(print) {	
 	var allContent = window.storyData[0];
 	var a = allContent;
 	var i = 0;
 	var c = 0;
 	var s = 0;
+	var ss = 0;
 	var sectionName = '';
 	var pasid=0;
 	var tag='';
@@ -33,41 +32,35 @@ function makePDF(print) {
 		content = content.replace(/^\/\/.*(\r\n|\n)?/g, ''); // to avoid clashes with URLs, lines must start with these
 		sections[i-2] = {name:sectionName, pid: pasid, tags: tag, source: content};
 	}
-
 	var pdfDocDef = {
 		content: [],
 		defaultStyle: { font: 'CourierPrime' },
 		styles: {
-			//sketchItem : {
-				//margin: [ 0,0,-25,0 ]
-			//}
+			sketch : {margin: [ 0,0,-25,0 ]},
 			sch: {margin: [0, 10, 0, 0]},
 			tra: {
 				alignment: "right",
 				margin: [0,10, 0, 0]
 			},
-			cha: {margin: [190, 10, 144, 0]},
-			dia: {margin: [110, 0, 110, 0]},
-			act: {margin: [0, 10, 0, 0]},
-			par: {margin: [144,0,110,0]},
+			cha: {	margin: [190, 10, 144, 0]},
+			dia: {	margin: [110, 0, 110, 0], width: 324},
+			act: {	margin: [0, 10, 0, 0]},
+			par: {	margin: [144,0,110,0]},
 			link: {
-				fontSize: 20,
+				fontSize: 16,
 				margin: [0,20,0,0]
 			},
 		},
 		pageMargins: [70,70],
 		pageSize: 'LETTER',
-		
 	};
 	var runningTotal = 0;
 	for (i=0; i<sections.length; i++) { //parse the text into html-readable segments because SECTIONS IS MADE NOW! YAY!
 		if (window.sketchMode === true) {
 			sections[i] = pdfSketchParser(sections[i]);
-			pdfDocDef.content.push({ul : sections[i].source, style: 'sketch'}); //In sketch mode, it's a simple unordered list.
-			//pdfDocDef.content[i].style = "sketchItem";
+			pdfDocDef.content.push({ul : sections[i].source, style: 'sketch', name: sections[i].name}); //In sketch mode, it's a simple unordered list.
 			if (i != (sections.length - 1)) {
 				pdfDocDef.content[i].pageBreak = "after";
-
 			}
 		} else {
 			sections[i] = pdfProductionParser(sections[i]);
@@ -83,18 +76,81 @@ function makePDF(print) {
 			}
 		}
 	}
-	delete pdfDocDef.content[sections.length - 1].pagebreak;
-	var d = sections[sections.length-1];
-	delete d[d.length-1].pageBreak;
-	i = 0;
-	s = 0;
 	pdfMake.fonts = {CourierPrime: { normal: 'CourierPrime.ttf' }};
 	var docuObj = pdfMake.createPdf(pdfDocDef);
-	docuObj._createDoc(); //_createDoc() method makes essentially does the hard math for ya. This puppy was a BITCH to find. TODO: Downside: destroys the content of #page. Need to fix that.
+	docuObj._createDoc(); //_createDoc() method makes essentially does the hard math for ya. This puppy was a BITCH to find.
+
 	if (window.sketchMode === true) { //Time to make the links match the page numbers.
-	} else { //sketchmode's off.
+		i = 0; //iterations
+		s = 0; //subiterations
+		ss = 0; //sub-sub-iterations
+		var linkRegex = /\[\[(.*?)\]\](\r\n|\n)?/;
+		//links time!
+		var manipstring;
+		var barIndex;
+		var endIndex;
+		var target;
+		var lineContent;
+		var targetPage;
 		for (i=0; i<docuObj.docDefinition.content.length; i++) {
-			if (docuObj.docDefinition.content[i].style == "link") {
+			for (s=0; s<docuObj.docDefinition.content[i].ul.length; s++) {
+				if (docuObj.docDefinition.content[i].ul[s].text.substring(0,2) === "[[") {
+					manipstring = docuObj.docDefinition.content[i].ul[s].text;
+					barIndex = manipstring.indexOf('|');
+					endIndex = manipstring.indexOf(']]');
+					target = manipstring.slice(barIndex + 1,endIndex);
+					lineContent = manipstring.slice(2, barIndex);
+					console.log(docuObj);
+					for (ss=0; ss<docuObj.docDefinition.content.length; ss++) { //target to the correct page.
+						if (docuObj.docDefinition.content[ss].name == target) {
+							docuObj.docDefinition.content[i].ul[s].text = "To " + lineContent + ", go to page " + JSON.stringify(docuObj.docDefinition.content[ss].positions[0].pageNumber) + "."; 
+						}
+						console.log(docuObj.docDefinition.content[i].ul[s].text);
+					}
+				}
+			}
+		}
+		//console.log(docuObj.docDefinition.content[0].ul[0].text);
+		
+	} else { //sketchmode's off.
+		delete pdfDocDef.content[sections.length - 1].pagebreak;
+		var d = sections[sections.length-1];
+		delete d[d.length-1].pageBreak;
+		i = 0; //iterations
+		s = 0; //subiterations
+		ss = 0; //sub-sub-iterations
+		var prevPage = 1;
+		var currPage = 1;
+		for (i=0; i<docuObj.docDefinition.content.length; i++) {
+			for (s=0; s<docuObj.docDefinition.content[i].positions.length; s++) {
+				//bypassing a bug where pdfmake forgets to do text wrapping on page 2.
+				currPage = docuObj.docDefinition.content[i].positions[s].pageNumber;
+				if (currPage != prevPage) {
+					if (!docuObj.docDefinition.content[i-1].pageBreak) { //Don't wanna do double pagebreaks.
+						if (docuObj.docDefinition.content[i].style == "act") {
+							docuObj.docDefinition.content[i].pageBreak = "before";
+						} else if (docuObj.docDefinition.content[i].style == "cha") {
+							docuObj.docDefinition.content[i].pageBreak = "before";
+						} else if (docuObj.docDefinition.content[i].style == "dia") {
+							if (docuObj.docDefinition.content[i-1].style == "par") {
+								docuObj.docDefinition.content[i-2].pageBreak = "before";
+							} else {
+								docuObj.docDefinition.content[i-1].pageBreak = "before";
+							}
+ 						} else if (docuObj.docDefinition.content[i].style == "sch") {
+							docuObj.docDefinition.content[i].pageBreak = "before";
+						} else if (docuObj.docDefinition.content[i].style == "tra") {
+							docuObj.docDefinition.content[i].pageBreak = "after";
+						} else if (docuObj.docDefinition.content[i].style == "par") {
+							docuObj.docDefinition.content[i-1].pageBreak = "before";
+						}
+					}
+				}
+				prevPage = currPage;
+			}
+		}
+		for (i=0; i<docuObj.docDefinition.content.length; i++) {
+			if (docuObj.docDefinition.content[i].style == "link") {// make the links work.
 				for (s=0; s<docuObj.docDefinition.content.length; s++) {
 					if (docuObj.docDefinition.content[s].bookmark == docuObj.docDefinition.content[i].target) {
 							docuObj.docDefinition.content[i].text = docuObj.docDefinition.content[i].text + docuObj.docDefinition.content[s].positions[0].pageNumber + "."; 
@@ -107,11 +163,12 @@ function makePDF(print) {
 		try {
 			pdfMake.createPdf(pdfDocDef).print();  //USE THIS ONLY WHEN READY FOR PRODUCTION
 		} catch(e) { alert("This feature is only available in Chrome at this time");}
-		
+
 	} else {
-		docuObj.open();
+		try {
+			docuObj.open();
+		} catch (e) {alert("There has been a problem. Please temporarily disable your popup blocker and refresh the page to continue.");}
 	}
-	
 }
 
 function pdfProductionParser (Section) {
@@ -132,7 +189,6 @@ function pdfProductionParser (Section) {
 	var lineContent;
 	var target;
 	var targetBookmark;
-
 	try {
 		textExists = true;
 		for (i=0; i < sourceMatches.length; i++) {
@@ -189,10 +245,11 @@ function pdfProductionParser (Section) {
 					lineObj = {text: lineContent, style: lineType, target: targetBookmark, last : lastItem, bookmark: Section.name};	
 				} else {
 					lineObj = {text: lineContent, style: lineType, target: targetBookmark, last : lastItem};
+
 				}
 			} else {
 				if (i === 0) {
-					lineObj = {text: lineContent, style: lineType, last : lastItem, bookmark: Section.name};	
+					lineObj = {text: lineContent, style: lineType, last : lastItem, bookmark: Section.name};
 				} else {
 					lineObj = {text: lineContent, style: lineType, last : lastItem};
 				}

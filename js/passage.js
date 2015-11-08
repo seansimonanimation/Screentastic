@@ -31,6 +31,9 @@ _.extend(Passage.prototype, {
 	Returns the HTML source.
 	This is where the magic happens.*/
 	render: function() {
+		if (window.bypassError === true) {
+			window.bypassError = false; // make sure that the error handler is active.
+		}
 		var result = '';
 		var unes = _.unescape(this.source); //unes is the unescaped source.
 		unes = unes.replace(/\/\*.*\*\//g, '');

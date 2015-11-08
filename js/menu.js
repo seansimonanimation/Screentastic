@@ -27,7 +27,9 @@ function menuButtonFunc() {
 
 }
 
-function PDFFunc(print) { //printing is not implemented yet, but some infrastructure for it is.
+function PDFFunc(print) {
+	
+	window.bypassError = true;
 	if (print === true) {
 		//alert("Sorry, Printing isn't implemented yet... :(");
 		makePDF(true);

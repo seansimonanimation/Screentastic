@@ -145,8 +145,9 @@ _.extend(Story.prototype,
 
 					message += ')';
 				};
-
-				$('#page').html(this.errorMessage.replace('%s', message));	
+				if (window.bypassError === false) {
+					$('#page').html(this.errorMessage.replace('%s', message));
+				}	
 			};
 		}.bind(this);
 
@@ -253,6 +254,7 @@ _.extend(Story.prototype,
 	/*
 	 Returns the HTML source for a passage. This is most often used when embedding one passage inside another. In this instance, make sure to use <%= %> instead of <%- %> to avoid incorrectly encoding HTML entities. @method render @param idOrName {String or Number} ID or name of the passage @return {String} HTML source code
 	*/
+
 
 	render: function (idOrName)
 	{
