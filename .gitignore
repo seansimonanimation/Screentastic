@@ -20,3 +20,8 @@ $RECYCLE.BIN/
 
 # Mac horseshit
 .DS_Store
+
+###################
+## TESTING
+###################
+lib/pdfmake.js

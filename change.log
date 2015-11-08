@@ -70,3 +70,8 @@ Added a bunch of new features
 known issues:
 	The page parser's spacing for adding new pages is not always consistent.
 	The links in the menu don't work. Don't worry, they just haven't been programmed yet. They should be done save for the PDF items by 0.4.0.
+
+v0.4.0
+------
+Changes:
+Added PDF generation for both Production Mode as well as Sketch Mode!
