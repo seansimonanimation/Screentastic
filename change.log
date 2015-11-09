@@ -74,4 +74,9 @@ known issues:
 v0.4.0
 ------
 Changes:
-Added PDF generation for both Production Mode as well as Sketch Mode!
+It's been a long time coming, but I've added PDF generation for both Production Mode as well as Sketch Mode!
+
+known issues:
+	Generating a PDF doesn't work inside Twine. Only inside browsers.
+	Sketch mode is pretty spotty on where and when it wants to include unordered list dots. (Might warrant a recode).
+	Page margins between pages still needs work.
