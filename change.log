@@ -83,12 +83,13 @@ known issues:
 
 v0.5.0
 ------
+Most of the big stuff is in! At this point it's just filling in the gaps, making fixes, and removing obsolete code.
 Changes
-	Back button works.
-	Forward button works.
-	Quicksave works.
-	Quickload works.
-	We have hotkeys!
+	Back button
+	Forward button
+	Quicksave
+	Quickload
+	We now have hotkeys!
 		hotkey list:
 			ctrl+left: Back
 			ctrl+right: Forward
@@ -96,4 +97,5 @@ Changes
 			ctrl+up: Quickload
 			ctrl+alt+O: Create and open PDF document
 			ctrl+alt+P: Create and print PDF Document (experimental)
-	
+	Darkened the icons on the menu bar (All the buttons work now so no reason not to)
+	Added labels below the icons on the menu bar.
