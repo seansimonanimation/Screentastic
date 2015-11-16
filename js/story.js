@@ -162,6 +162,61 @@ _.extend(Story.prototype,
 			};
 		}.bind(this);
 
+		//Set up the hotkeys
+		$(document).keydown(function(e) {
+			switch(e.which) {
+				case 37: // left
+					if (e.ctrlKey) {
+						bfFunc("back");
+					} else {
+						window.scrollBy(-20,0);
+					}
+					break;
+	
+				case 38: // up
+					if (e.ctrlKey){
+						quickLoadFunc();
+					} else {
+						window.scrollBy(0,-20);
+					}
+					break;
+
+				case 39: // right
+					if (e.ctrlKey) {
+						bfFunc("forward");
+					} else {
+						window.scrollBy(20,0);
+					}
+
+					break;
+	
+				case 40: // down
+					if (e.ctrlKey) {
+						quickSaveFunc();
+					} else {
+						window.scrollBy(0,20);
+					}
+					break;
+				case 79: // O
+					if (e.altKey && e.ctrlKey) {
+						PDFFunc(false);
+					}
+					break;
+				case 80: // P
+					if (e.altKey && e.ctrlKey) {
+						PDFFunc(true);
+					}
+					break;
+	
+				default: return; // exit this handler for other keys
+			}
+			e.preventDefault(); // prevent the default action (scroll / move caret)
+		});
+
+
+
+
+
 		// activate user styles
 
 		_.each(this.userStyles, function (style)

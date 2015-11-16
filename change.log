@@ -80,3 +80,20 @@ known issues:
 	Generating a PDF doesn't work inside Twine. Only inside browsers.
 	Sketch mode is pretty spotty on where and when it wants to include unordered list dots. (Might warrant a recode).
 	Page margins between pages still needs work.
+
+v0.5.0
+------
+Changes
+	Back button works.
+	Forward button works.
+	Quicksave works.
+	Quickload works.
+	We have hotkeys!
+		hotkey list:
+			ctrl+left: Back
+			ctrl+right: Forward
+			ctrl+down: Quicksave
+			ctrl+up: Quickload
+			ctrl+alt+O: Create and open PDF document
+			ctrl+alt+P: Create and print PDF Document (experimental)
+	
