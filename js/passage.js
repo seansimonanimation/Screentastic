@@ -166,37 +166,52 @@ _.extend(Passage.prototype, {
 		tempPassage.innerHTML = ""; //Element needs to be cleared out before we can begin.
 		var tempHeight = 0;
 		var i = 0;
+		var s = 0;
 		var heightRegEx = /.*(\r\n|\n)?/g;
 		var itemArr = original.match(heightRegEx);
 		var heightSubtractor = 0;
 		var pageCounter = 1;
 		var result = '';
 		var pageDistance = [];
-		//We need to build the "#passageConstruction" div line by line, test the height, and add pages based on that height. To do that, we need to make the tempPassage workable. AKA not display: hidden;
+		var newstring = '';
+		var changePageArr = []
+		var firstPart = '';
+		var breakoff = '';
+		var secondPart = '';
+		var pageChangeArr = [];
+		var pageBreak = '';
+		//We need to build the "#passageConstruction" div character by character (used to be line by line), test the height, and add pages based on that height. To do that, we need to make the tempPassage workable. AKA not display: hidden;
 		tempPassage.style.position = "absolute";
-		tempPassage.style.visibility = "visible";
+		tempPassage.style.visibility = "hidden";
 		tempPassage.style.display = "block";
 		tempPassage.style.width = "672px";
 		tempPassage.style.left = "0px";
 		tempPassage.style.top = "0px";
-		for (i=0; i < itemArr.length; i++) {
-			$("#passageConstruction").append(itemArr[i]);
-			tempHeight = tempPassage.clientHeight;	
-			if (tempHeight > 900) {
-				pageDistance = 972 - tempHeight + 82;
-				if (window.sketchMode === false) {
-					itemArr[i-1] = itemArr[i-1].substring(0,itemArr[i-1].length -1) + "</div><br /><div id=\"page\" style=\"position:relative;left:-73px;top:" + pageDistance + "px;\">\n";
-					tempPassage.innerHTML = ""; //Element needs to be cleared so we can start fresh with the new div.
-					$("#passageConstruction").append(itemArr[i]);
-				} else {
-					itemArr[i-1] = itemArr[i-1].substring(0,itemArr[i-1].length -1) + "</ul></div><br /><div id=\"page\"style=\"position:relative;left:-73px;top:" + pageDistance + "px;\"><ul>\n";
-					tempPassage.innerHTML = ""; //Element needs to be cleared so we can start fresh with the new div.
-					$("#passageConstruction").append(itemArr[i]);
+		for (i=0; i<itemArr.length; i++) {
+			for (s=0; s<itemArr[i].length; s++) {
+				newstring = newstring + itemArr[i][s];
+				$("#passageConstruction").html(newstring);				
+				tempHeight = tempPassage.clientHeight;
+				if (tempHeight > 900) {
+					pageDistance = 972 - tempHeight + 82;
+					if (window.sketchMode === false ) {
+						//instead of breaking our flow, let's make a new object now and inject everything later.
+						//What we're doing is inserting the page break at the beginning of the word.
+						var pageBreak = "</div><br /><div id=\"page\" style=\"position:relative;left:-73px;top:" + pageDistance + "px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div>\n";
+						pageChangeArr[pageCounter-1] = { index: i, text: pageBreak + itemArr[i]};
+						tempPassage.innerHTML = "";
+						newstring = "";
+						pageCounter = pageCounter + 1;
+					} else {
+						pageBreak = "</ul></div><br /><div id=\"page\"style=\"position:relative;left:-73px;top:" + pageDistance + "px;\"><ul>\n";
+						pageChangeArr[pageCounter-1] = { index: i, text: pageBreak + itemArr[i]};
+					}
 				}
-				pageCounter = pageCounter + 1;
 			}
 		}
-		
+		for (i=0; i<pageChangeArr.length; i++) {
+			itemArr[pageChangeArr[i].index] = pageChangeArr[i].text;
+		}
 		i=0;
 		for (i=0; i<itemArr.length; i++) {
 			result = result + itemArr[i];		

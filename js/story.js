@@ -197,12 +197,12 @@ _.extend(Story.prototype,
 						window.scrollBy(0,20);
 					}
 					break;
-				case 79: // O
+				case 79: // CTRL + ALT + O
 					if (e.altKey && e.ctrlKey) {
 						PDFFunc(false);
 					}
 					break;
-				case 80: // P
+				case 80: // CTRL + ALT +P
 					if (e.altKey && e.ctrlKey) {
 						PDFFunc(true);
 					}
@@ -210,7 +210,7 @@ _.extend(Story.prototype,
 	
 				default: return; // exit this handler for other keys
 			}
-			e.preventDefault(); // prevent the default action (scroll / move caret)
+			e.preventDefault(); // prevent the default action (scroll / move caret). If we want default action, we need to code it in.
 		});
 
 

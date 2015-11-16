@@ -84,7 +84,7 @@ known issues:
 v0.5.0
 ------
 Most of the big stuff is in! At this point it's just filling in the gaps, making fixes, and removing obsolete code.
-Changes
+Additions:
 	Back button
 	Forward button
 	Quicksave
@@ -99,3 +99,7 @@ Changes
 			ctrl+alt+P: Create and print PDF Document (experimental)
 	Darkened the icons on the menu bar (All the buttons work now so no reason not to)
 	Added labels below the icons on the menu bar.
+
+Fixes: 
+	Fixed hole punches not showing up on dynamically generated pages.
+	Made the spacing more consistent on the dynamically generated pages. (I think.)
