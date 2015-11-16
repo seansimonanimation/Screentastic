@@ -3,7 +3,7 @@
 	height: 35px;
 	width: 50px;
 	right: 20px;
-	color: #999;
+	color: #555;
 	border:solid;
 	border-width: 3px;
 	border-color: #999;
@@ -61,7 +61,7 @@
 #menuItem {
 	font-family: 'Screentastic_Icons';
 	font-size: 400%;
-	color: #DDD;
+	color: #555;
 	line-height: 100px;
 	position: relative;
 	display: inline-block;
@@ -88,5 +88,12 @@
 }
 
 .pageMenuPos {
-top: 100px;
+	top: 100px;
+}
+
+.buttonlabel {
+	font-size: small;
+	font-family: 'CourierPrime';
+	line-height: 50%;
+	margin-top: -12px;
 }

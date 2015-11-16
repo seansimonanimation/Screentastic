@@ -16,12 +16,12 @@
 <body>
 
 <div id="menuBar" class="menuGone">
-	<span id="menuItem" class="backButton" onclick="backFunc()">a</span>
-	<span id="menuItem" class="forwardButton" onclick="forwardFunc()">b</span>
-	<span id="menuItem" class="quickSaveButton" onclick="quickSaveFunc()">e</span>
-	<span id="menuItem" class="quickLoadButton" onclick="quickLoadFunc()">f</span>
-	<span id="menuItem" class="makePDFButton" onclick="var print=false;PDFFunc(print);">h</span>
-	<span id="menuItem" class="makePrintButton" onclick="var print=true;PDFFunc(print);">d</span>
+	<span id="menuItem" class="backButton" onclick="bfFunc('back');">a<p class="buttonlabel">Back</p></span>
+	<span id="menuItem" class="forwardButton" onclick="bfFunc('forward');">b<p class="buttonlabel">Forward</p></span>
+	<span id="menuItem" class="quickSaveButton" onclick="quickSaveFunc()">e<p class="buttonlabel">Quicksave</p></span>
+	<span id="menuItem" class="quickLoadButton" onclick="quickLoadFunc()">f<p class="buttonlabel">Quickload</p></span>
+	<span id="menuItem" class="makePDFButton" onclick="var print=false;PDFFunc(print);">h<p class="buttonlabel">Open PDF</p></span>
+	<span id="menuItem" class="makePrintButton" onclick="var print=true;PDFFunc(print);">d<p class="buttonlabel">Print PDF</p></span>
 </div>
 
 <div id="menuButton" class="menuAwayButton" onclick="menuButtonFunc()">^</div>
@@ -125,7 +125,7 @@ The End.
 <script src="lib/underscore.js"></script>
 <script src="lib/marked.js"></script>
 <script src="lib/lz-string.js"></script>
-<script src='lib/pdfmake.js'></script>
+<script src='lib/pdfmake.min.js'></script>
 <script src='lib/vfs_fonts.js'></script>
 
 

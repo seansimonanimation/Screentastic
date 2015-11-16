@@ -117,6 +117,16 @@ _.extend(Story.prototype,
 
 		$('body').on('click', 'a[data-passage]', function (e)
 		{
+			if (typeof window.BorFLastUsed == 'undefined') {
+				window.BorFLastUsed = false;
+			} else {
+				if (window.BorFLastUsed === true) {
+					if ( _.lastIndexOf(window.story.history) != window.historyIndex) { 
+						window.story.history = window.story.history.slice(0,window.historyIndex);
+					}
+				}
+			}
+			window.BorFLastUsed = false; //Allow the history to continue.
 			this.show(_.unescape($(e.target).attr('data-passage')));
 		}.bind(this));
 
@@ -124,6 +134,7 @@ _.extend(Story.prototype,
 
 		$(window).on('hashchange', function()
 		{
+
 			this.restore(window.location.hash.replace('#', ''));	
 		}.bind(this));
 
@@ -217,10 +228,11 @@ _.extend(Story.prototype,
 
 		$.event.trigger('showpassage', { passage: window.passage });
 
-		if (! noHistory)
-		{
-			this.history.push(passage.id);
-
+		if (! noHistory) {
+			
+			if (typeof window.BorFLastUsed == 'undefined' || window.BorFLastUsed === false) {
+				this.history.push(passage.id);
+			}
 			try
 			{
 				if (this.atCheckpoint)
