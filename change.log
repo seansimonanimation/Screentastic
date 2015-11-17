@@ -81,7 +81,7 @@ known issues:
 	Sketch mode is pretty spotty on where and when it wants to include unordered list dots. (Might warrant a recode).
 	Page margins between pages still needs work.
 
-v0.5.0
+v0.4.5
 ------
 Most of the big stuff is in! At this point it's just filling in the gaps, making fixes, and removing obsolete code.
 Additions:

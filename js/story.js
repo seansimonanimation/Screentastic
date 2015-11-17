@@ -199,12 +199,12 @@ _.extend(Story.prototype,
 					break;
 				case 79: // CTRL + ALT + O
 					if (e.altKey && e.ctrlKey) {
-						PDFFunc(false);
+						pdfFunc(false);
 					}
 					break;
 				case 80: // CTRL + ALT +P
 					if (e.altKey && e.ctrlKey) {
-						PDFFunc(true);
+						pdfFunc(true);
 					}
 					break;
 	

@@ -30,7 +30,11 @@ gulp.task('jshint', function()
 				Story: true,
 				makePDF: true,
 				pdfMake: true,
-				storyData: true
+				storyData: true,
+				bfFunc: true,
+				quickLoadFunc: true,
+				pdfFunc: true,
+				quickSaveFunc: true
 			},
 			globalstrict: true, // OK to use 'use strict'; instead of function
 			"-W032": true, // Unnecessary semicolon

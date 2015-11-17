@@ -174,7 +174,7 @@ _.extend(Passage.prototype, {
 		var result = '';
 		var pageDistance = [];
 		var newstring = '';
-		var changePageArr = []
+		var changePageArr = [];
 		var firstPart = '';
 		var breakoff = '';
 		var secondPart = '';
@@ -197,7 +197,7 @@ _.extend(Passage.prototype, {
 					if (window.sketchMode === false ) {
 						//instead of breaking our flow, let's make a new object now and inject everything later.
 						//What we're doing is inserting the page break at the beginning of the word.
-						var pageBreak = "</div><br /><div id=\"page\" style=\"position:relative;left:-73px;top:" + pageDistance + "px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div>\n";
+						pageBreak = "</div><br /><div id=\"page\" style=\"position:relative;left:-73px;top:" + pageDistance + "px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div>\n";
 						pageChangeArr[pageCounter-1] = { index: i, text: pageBreak + itemArr[i]};
 						tempPassage.innerHTML = "";
 						newstring = "";

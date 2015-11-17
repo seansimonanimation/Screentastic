@@ -27,7 +27,7 @@ function menuButtonFunc() {
 
 }
 
-function PDFFunc(print) {
+function pdfFunc(print) {
 	
 	window.bypassError = true;
 	if (print === true) {
