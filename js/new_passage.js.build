@@ -4,7 +4,7 @@
 
 function Passage (id, name, tags, source) {
 	//the numeric id of the passage. Super importante. Number, readonly.
-	this.id = id;
+	this.pasid = id;
 	
 	//the name of the passage. Not as important. String.
 	this.name = name;
@@ -12,9 +12,23 @@ function Passage (id, name, tags, source) {
 	//the tags of the passage. Not used by me personally, but eh. Array.
 	this.tags = tags;
 	
-	//The passage's source code. String.
-	this.source = _.unescape(source);
-
+	//The passage's source code. Returns an array that later becomes a string during inital processing.
+	this.text = {
+		print: (function(){
+			if (window.story.sketchMode === false){
+				return this._pdfProduction(_.unescape(source));
+			} else {
+				return this._pdfSketch(_.unescape(source));
+			}
+		})(),
+		browser : (function(){		
+			if (window.story.sketchMode === false){
+				return this._sketchMachine(_.unescape(source));
+			} else {
+				return this._productionMachine(_.unescape(source));
+			}
+		})()
+	};
 	//a storage place for knowing if text exists in the passage
 	this.textExists = false;
 
@@ -23,36 +37,15 @@ function Passage (id, name, tags, source) {
 
 	//a storage place for the page height, for knowing if we need to add pages.
 	this.pageHeight = 0;
+
 }
 
 
 _.extend(Passage.prototype, {
-	/*Stolen from Chris Klimas. 
-	Runs the source through Underscore's template parser then through a Markdown renderer, then converts bracketed links into proper passage links.
-	Returns the HTML source. This is where the magic happens.*/
-	render: function() {
-		window.bypassError = false; // make sure that the error handler is active.
-		this.pageHeight = 0;
-		var result = '';
-		var unes = _.unescape(this.source); //unes is the unescaped source.
-		unes = unes.replace(/\/\*.*\*\//g, '');
-		// Remove // comments
-		// to avoid clashes with URLs, lines must start with these
-		unes = unes.replace(/^\/\/.*(\r\n?|\n)/g, '');
-		if (window.story.sketchMode === false) {
-			result = this._formatMachine(unes);//Takes the unescaped source and returns the completed text!
-		} else { 
-		//we're in sketch mode now. Sketchmode is a pretty simple concept. It just takes each line and turns it into an unordered list.
-			result = this._sketchMachine(unes);
-		}
-		return result;
-
-	},
-	
 
 	//Helper functions are here. Technically all part of _.extend(Passage.prototype, { which is on line 27 at this time.
 	/*
-	(stolen from snowman) A helper function that is connected to passage templates as $. It acts like the jQuery $ function, running a script when the passage is ready in the DOM. The function passed is also bound to div#page for convenience. If this is *not* passed a single function, then this acts as a passthrough to jQuery's native $ function. @method _readyFunc @return jQuery object, as with jQuery() @private
+	 A helper function that is connected to passage templates as $. It acts like the jQuery $ function, running a script when the passage is ready in the DOM. The function passed is also bound to div#page for convenience. If this is *not* passed a single function, then this acts as a passthrough to jQuery's native $ function. @method _readyFunc @return jQuery object, as with jQuery() @private
 	*/
 	_formatMachine: function(original){
 		var lineRegExp =/(\w{3}>>(.*)(\r\n|\n)?|\[\[(.*?)\]\](\r\n|\n)?)/g; //both the link grabber and the text grabber combined!

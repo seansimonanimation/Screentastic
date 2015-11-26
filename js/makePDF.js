@@ -77,9 +77,10 @@ function makePDF(print) {
 		}
 	}
 	pdfMake.fonts = {CourierPrime: { normal: 'CourierPrime.ttf' }};
+	console.log(pdfDocDef);
 	var docuObj = pdfMake.createPdf(pdfDocDef);
-	docuObj._createDoc(); //_createDoc() method makes essentially does the hard math for ya. This puppy was a BITCH to find.
-
+	//docuObj._createDoc(); //_createDoc() method makes essentially does the hard math for ya. This puppy was a BITCH to find.
+	//console.log(docuObj);
 	if (window.sketchMode === true) { //Time to make the links match the page numbers.
 		i = 0; //iterations
 		s = 0; //subiterations
@@ -166,6 +167,7 @@ function makePDF(print) {
 
 	} else {
 		try {
+			console.log(docuObj);
 			docuObj.open();
 		} catch (e) {alert("There has been a problem. Please temporarily disable your popup blocker and refresh the page to continue.");}
 	}
