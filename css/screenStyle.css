@@ -8,6 +8,7 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 	border-width: 1px;
 	padding: 72px;
 	z-index: 5;
+	word-wrap: break-word;
 }
 .pageDefaultPos {
 	position: relative;
@@ -29,15 +30,19 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 }
 
 #schCont {
+	/*character length: 62*/
 	position: relative;
 	display: block;
 	margin-left: 69px;
 	width: 600px;
 	text-transform: uppercase;
 	margin-top: 20px;
+	word-wrap: break-word;
+
 }
 
 #traCont {
+	/*character length: 62*/
 	position: relative;
 	display: block;
 	margin-left: 69px;
@@ -45,37 +50,50 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 	text-transform: uppercase;
 	text-align: right;
 	margin-top: 20px;
+	word-wrap: break-word;
+
+}
+
+#actCont {
+	/*character length: 62*/
+	position: relative;
+	display: block;
+	margin-left: 69px;
+	width: 600px;
+	margin-top: 20px;
+	word-wrap: break-word;
+
+}
+
+#diaCont {
+	/*character length: 33*/
+	position: relative;
+	display: block;
+	margin-left: 180px;
+	width: 324px;		
+	word-wrap: break-word;
+
 }
 
 #chaCont {
+	/*character length: 26*/
 	position: relative;
 	display: block;
 	margin-left: 288px;
 	width: 250px;
 	text-transform: uppercase;
 	margin-top: 20px;
-}
-
-#diaCont {
-	position: relative;
-	display: block;
-	margin-left: 180px;
-	width: 324px;		
-}
-
-#actCont {
-	position: relative;
-	display: block;
-	margin-left: 69px;
-	width: 600px;
-	margin-top: 20px;
+	word-wrap: break-word;
 }
 
 #parCont {
+	/*character length: 26*/
 	position: relative;
 	display: block;
 	margin-left: 212px;
 	width: 250px;
+	word-wrap: break-word;
+
 }
 
 #linkCont {
@@ -84,9 +102,14 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 	margin-left: 69px;
 	width: 600px;
 	margin-top: 20px;
+	word-wrap: break-word;
+
 }
 
 
+ul {
+	word-wrap: break-word;
+}
 
 #pageNumberCont {
 /*Future Feature: Page numbers that reflect what'll be seen on the PDF.*/
