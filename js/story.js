@@ -6,78 +6,87 @@
 	// el = element? This is the snowman var name, so I'm guessing here.
 
 
-function Story (el)
-{
-	// set up basic properties
+function Story (raw){
+	// set up basic properties. We'll structure this so that both screen mode and the PDF maker can pull this data.
 
-	this.el = el;
-	/*
-	 The name of the story. @property name @type String @readonly
-	*/
-	this.name = el.attr('name');
+	//Here are some statics, but they need to be added to the object for the PDF stuff.
+	
+	this.defaultStyle = { font: 'CourierPrime' };
+	this.styles = {
+		sketch : {margin: [ 0,0,-25,0 ]},
+		sch: {margin: [0, 10, 0, 0]},
+		tra: {
+			alignment: "right",
+			margin: [0,10, 0, 0]
+		},
+		cha: {	margin: [190, 10, 144, 0]},
+		dia: {	margin: [110, 0, 110, 0], width: 324},
+		act: {	margin: [0, 10, 0, 0]},
+		par: {	margin: [144,0,110,0]},
+		link: {
+			fontSize: 16,
+			margin: [0,20,0,0]
+		}
+	};
+	this.pageMargins = [70,70];
+	this.pageSize = "LETTER";
+
+
+	//raw is new Story($('tw-storydata')); AKA all the stuff inside the <tw-storydata> DOM element. We won't change this so we can have a pure copy of the data to pull from at all times.
+	this.raw = raw;
+	 //The name of the story. @property name @type String @readonly
+	this.name = raw.attr('name');
 	/*
 	 The ID of the first passage to be displayed. @property startPassage @type Number @readonly
 	*/
-	this.startPassage = parseInt(el.attr('startnode'));
-	/*
-	 The program that created this story. @property creator @type String @readonly
-	*/
-	this.creator = el.attr('creator');
-	/*
-	 The version of the program used to create this story. @property creatorVersion @type String @readOnly
-	*/
-	this.creatorVersion = el.attr('creator-version');
+	this.startPassage = parseInt(raw.attr('startnode'));
+
+	//The program that created this story. @property creator @type String @readonly
+	this.creator = raw.attr('creator');
+	
+	// The version of Twine used to create this story. @property creatorVersion @type String @readOnly
+	this.creatorVersion = raw.attr('creator-version');
+
 	// initialize history and state
-	/*
-	 An array of passage IDs, one for each passage viewed during the current
-	 session. @property history @type Array @readOnly
-	*/
+	//An array of passage IDs, one for each passage viewed during the current session. @property history @type Array @readOnly
 	this.history = [];
-	/*
-	 If set to true, then any JavaScript errors are ignored -- normally, play would end with a message shown to the user.  @property ignoreErrors @type Boolean
-	**/
+	
+	 //If set to true, then any JavaScript errors are ignored -- normally, play would end with a message shown to the user.  @property ignoreErrors @type Boolean
 	this.ignoreErrors = false;
-	/*
-	 The message shown to users when there is an error and ignoreErrors is not true. Any %s in the message will be interpolated as the actual error messsage. @property errorMessage @type String
-	*/
+
+	// The message shown to users when there is an error and ignoreErrors is not true. Any %s in the message will be interpolated as the actual error messsage. @property errorMessage @type String
 	this.errorMessage = '\u26a0 %s';
-	/*
-	 An array of all passages, indexed by ID. @property passages @type Array
-	*/
-	this.passages = [];
-	var p = this.passages;
-	el.children('tw-passagedata').each(function (el){
-		var $t = $(this);
-		var id = parseInt($t.attr('pid'));
-		var tags = $t.attr('tags');
 
-		p[id] = new Passage(id, $t.attr('name'), (tags !== '' && tags !== undefined) ? tags.split(' ') : [], $t.html());
-	});
-
+	//Find out if we're in sketchmode.
 	this.sketchMode = (function() {
-		var i;
-		for (i=1; i<p.length-1; i++) {
-			if (p[i].source.includes("sketch>>")) {
-				return true;
-			}
+		if ($("#page").text().includes("sketch>>")) {
+			return true;
 		}
 		return false;
 	})();
-	/*
-	 An array of user-specific scripts to run when the story is begun. @property userScripts @type Array
-	*/
-
-	this.userScripts = _.map(el.children('*[type="text/twine-javascript"]'), function (el){
-		return $(el).html();
+	//
+	// An array of all passages, indexed by ID. @property passages @type Array. The passages are turned into objects.
+	this.content = [];
+	var c = this.content;
+	raw.children('tw-passagedata').each(function (raw){
+		var $t = $(this);
+		var id = parseInt($t.attr('pid'));
+		var tags = $t.attr('tags');
+		c[id] = new Passage(id, $t.attr('name'), (tags !== '' && tags !== undefined) ? tags.split(' ') : [], $t.html());
 	});
-	/*
-	 An array of user-specific style declarations to add when the story is begun. @property userStyles @type Array
-	*/
-	this.userStyles = _.map(el.children('*[type="text/twine-css"]'), function (el)
-	{
-		return $(el).html();
+
+	// An array of user-specific scripts to run when the story is begun. @property userScripts @type Array
+	this.userScripts = _.map(raw.children('*[type="text/twine-javascript"]'), function (raw){
+		return $(raw).html();
+	});
+	// An array of user-specific style declarations to add when the story is begun. @property userStyles @type Array
+	this.userStyles = _.map(raw.children('*[type="text/twine-css"]'), function (raw){
+		return $(raw).html();
 	});
 };
+
+
+
 _.extend(Story.prototype,
 {
 	/*
@@ -223,9 +232,9 @@ _.extend(Story.prototype,
 	passage: function (idOrName)
 	{
 		if (_.isNumber(idOrName))
-			return this.passages[idOrName];
+			return this.content[idOrName];
 		else if (_.isString(idOrName))
-			return _.findWhere(this.passages, { name: idOrName });
+			return _.findWhere(this.content, { name: idOrName });
 	},
 
 	/*
@@ -255,7 +264,7 @@ _.extend(Story.prototype,
 			this.history.push(passage.id);
 		}
 		window.passage = passage;
-		$('#page').html(passage.render());
+		$('#page').html(passage.render()); //showing event. Displays the unescaped text from the browser section of the passage.
 
 		/*
 		 Triggered after a passage has been shown onscreen, and is now displayed in the div with id passage. The passage being displayed is stored in the passage property of the event. @event showpassage:after

@@ -61,7 +61,7 @@ function Story (raw){
 	this.content = [];
 	raw.children('tw-passagedata').each(function (raw){
 		var $t = $(this);
-		var id = parseInt($t.attr('pasid'));
+		var id = parseInt($t.attr('id'));
 		var tags = $t.attr('tags');
 		this.content[id] = new Passage(id, $t.attr('name'), (tags !== '' && tags !== undefined) ? tags.split(' ') : [], $t.html());
 	});
@@ -266,7 +266,7 @@ _.extend(Story.prototype,
 			this.history.push(passage.id);
 		}
 		window.passage = passage;
-		$('#page').html(_.unescape(passage.text.browser)); //showing event. Displays the unescaped text from the browser section of the passage.
+		$('#page').html(passage.render()); //showing event. Displays the unescaped text from the browser section of the passage.
 
 		/*
 		 Triggered after a passage has been shown onscreen, and is now displayed in the div with id passage. The passage being displayed is stored in the passage property of the event. @event showpassage:after

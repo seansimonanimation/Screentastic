@@ -8,17 +8,6 @@
 
 function Story (el)
 {
-
-
-
-
-
-
-
-
-
-
-
 	// set up basic properties
 
 	this.el = el;

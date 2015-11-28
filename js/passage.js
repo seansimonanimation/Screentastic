@@ -12,9 +12,9 @@ function Passage (id, name, tags, source) {
 	//the tags of the passage. Not used by me personally, but eh. Array.
 	this.tags = tags;
 	
-	//The passage's source code. String.
-	this.source = _.unescape(source);
-
+	//The passage's source code. Returns an array that later becomes a string during inital processing.
+	this.source = source;
+	this.stack = [];
 	//a storage place for knowing if text exists in the passage
 	this.textExists = false;
 
@@ -23,167 +23,93 @@ function Passage (id, name, tags, source) {
 
 	//a storage place for the page height, for knowing if we need to add pages.
 	this.pageHeight = 0;
+
 }
 
 
 _.extend(Passage.prototype, {
-	/*Stolen from Chris Klimas. 
-	Runs the source through Underscore's template parser then through a Markdown renderer, then converts bracketed links into proper passage links.
-	Returns the HTML source. This is where the magic happens.*/
-	render: function() {
-		window.bypassError = false; // make sure that the error handler is active.
-		this.pageHeight = 0;
-		var result = '';
-		var unes = _.unescape(this.source); //unes is the unescaped source.
-		unes = unes.replace(/\/\*.*\*\//g, '');
-		// Remove // comments
-		// to avoid clashes with URLs, lines must start with these
-		unes = unes.replace(/^\/\/.*(\r\n?|\n)/g, '');
-		if (window.story.sketchMode === false) {
-			result = this._formatMachine(unes);//Takes the unescaped source and returns the completed text!
-		} else { 
-		//we're in sketch mode now. Sketchmode is a pretty simple concept. It just takes each line and turns it into an unordered list.
-			result = this._sketchMachine(unes);
+
+
+	render: function(){
+
+		if (window.story.sketchMode === false){
+			this.stack = this._production(this.source);
+		} else {
+			this.stack =  this._sketch(this.source);
 		}
-		return result;
-
+		var passageDef = {
+			content: this.stack,
+			defaultStyle: window.story.defaultStyle,
+			styles: window.story.styles,
+			pageMargins: window.story.pageMargins,
+			pageSize: window.story.pageSize
+		};
+		console.log(passageDef);
+		var parsedObj = pdfMake.createPdf(passageDef);
+		window.bypassError = true;		
+		console.log(parsedObj);
+		parsedObj._createDoc();
 	},
-	
 
-	//Helper functions are here. Technically all part of _.extend(Passage.prototype, { which is on line 27 at this time.
+
+
+
+	//Helper functions are here. They are methods of Passage.
 	/*
-	(stolen from snowman) A helper function that is connected to passage templates as $. It acts like the jQuery $ function, running a script when the passage is ready in the DOM. The function passed is also bound to div#page for convenience. If this is *not* passed a single function, then this acts as a passthrough to jQuery's native $ function. @method _readyFunc @return jQuery object, as with jQuery() @private
+	 A helper function that is connected to passage templates as $. It acts like the jQuery $ function, running a script when the passage is ready in the DOM. The function passed is also bound to div#page for convenience. If this is *not* passed a single function, then this acts as a passthrough to jQuery's native $ function. @method _readyFunc @return jQuery object, as with jQuery() @private
 	*/
-	_formatMachine: function(original){
-		var lineRegExp =/(\w{3}>>(.*)(\r\n|\n)?|\[\[(.*?)\]\](\r\n|\n)?)/g; //both the link grabber and the text grabber combined!
-		var sourceMatches = original.match(lineRegExp); //returns an array of all line matches where the lines begin with itm>> or are links.
+
+
+
+	_production: function(original){
+	//Takes the original, unescaped string and turns it into an object array.
+		var lineRegExpG =/^((\w{3})(>>)(.*)$|\[\[(.*?)\|(.*?)\]\]$)/gm; //both the link grabber and the text grabber combined!
+		var lineRegExpL = /^((\w{3})(>>)(.*)$|\[\[(.*?)\|(.*?)\]\]$)/;
+		var sourceMatches = original.match(lineRegExpG); //returns an array of all line matches where the lines begin with itm>> or are links.
 		var i;
-		this.textExists = false;
-		try {
-			this.textExists = true;
-			for (i=0; i < sourceMatches.length; i++) {
-				var lineType = sourceMatches[i].substring(0,3);
-				var lineContent = sourceMatches[i].substring(5);
-				if (lineType == "if>" || lineType ==  ">>>" || lineType ==  "eli" || lineType ==  "els") {
-					continue; //We'll let conditional statements pass through... for now.
-					/*TODO: Conditional statement format: 
-							if>>> condition
-							itm>>item
-							itm>> item
-							>>>>> (end conditional statement)
+		for (i=0; i<sourceMatches.length; i++){
+		//turns the array items into un-undefined arrays.
+			sourceMatches[i] = sourceMatches[i].match(lineRegExpL);
+			delete sourceMatches[i][0];
+			sourceMatches[i] = $.grep(sourceMatches[i],function(n){ return(n); });//kills all the undefineds. 
+			if (sourceMatches[i].length == 4) { 
+			//regular items should have 4 items in their array at this point. Format: ["dia>>HAHA! HI!", "dia", ">>", "HAHA! HI!"]
+				sourceMatches[i] = {text: sourceMatches[i][3], style: sourceMatches[i][1]};
+			} else if (sourceMatches[i].length == 3){
+			//regular items should have 4 items in their array at this point. Format: ["[[target|display]]","target","display"]
+				sourceMatches[i] = {text: sourceMatches[i][3], target: sourceMatches[i][1], style: "link"};
 
-							if>>> condition
-							itm>>item
-							itm>> item
-							els>> (blank, else statement)
-							itm>> item
-							itm>> item
-							>>>>> (end conditional statement)
-
-							Else If support: (infinte else ifs)
-							if>>> condition
-							itm>>item
-							itm>> item
-							elif> other condition
-							itm>> item
-							itm>> item
-							elif> other condition
-							itm>> item
-							itm>> item
-							>>>>> (end conditional statement, else optional.)
-					It basically rejiggers the whole thing into a Javascript if statement,
-					then brings the whole chunk into one array element.		
-					*/
-				} else if (lineType == "act" || lineType == "sch" || lineType == "tra") {
-					lineContent = this.pageParser(lineType, lineContent, 62);
-				} else if (lineType == "dia"){
-					lineContent = this.pageParser(lineType, lineContent, 33);
-				} else if (lineType == "cha") {
-					lineContent = this.pageParser(lineType, lineContent, 26);	
-				} else if (lineType == "par") { //Auto-adds parenthases as necessary.
-					var matches = lineContent.match(/\s?(\()?([^)]*)(\))?$/); 
-					if (matches.length == 1) {
-						lineContent = "(" + lineContent + ")";
-					} else if (matches.length == 2) {
-						if (matches[0] == "(") {
-							lineContent =  lineContent + ")";
-						} else {
-							lineContent = "(" + lineContent;
-						}
-					}
-					lineContent = this.pageParser(lineContent, 26);
-				} else if (lineType.substring(0,2) == "[[") {
-					//link
-					lineType = "link";
-					this.linksExist = true;
-				}
-				if (lineType == "act" || lineType == "sch" || lineType == "tra" || lineType == "dia" || lineType == "cha" || lineType == "par"){
-					if (sourceMatches[i].substring(0,2) == ")(") {
-						original = original.replace(sourceMatches[i], lineContent.substring(2) + "</div>");
-					} else if (lineType == "link") {
-					original = original.replace(sourceMatches[i], this._linkMachine(sourceMatches[i]));					
-					} else {
-						original = original.replace(sourceMatches[i], '<div id=\"' + lineType + 'Cont\">' + lineContent + "</div>");
-					}
-				}
+			} else {
+				sourceMatches[i] = {text: "There is a problem with this item.", style: "err"};
 			}
-		} catch(err) {
-			this.textExists = false;
-			this.linksExist = false;
-			console.log(err);
 		}
-		if (this.linksExist === false && this.textExists === false) {	
-			original = '<center><h1>(This passage has no data or has some other unrecoverable error. Check the Javascript console for your error.)</h1></center>'; //lazy error catching, yay! Also lazy HTML! Yay! 
-		}
-		var holepunch = '<div id="holePunch"><h1 class="tophole">m</h1><h1 class="midhole">m</h1><h1 class="bothole">m</h1></div>';
-
-
- //holepunches only need to be in production mode.
-		return holepunch + original;
-
+		console.log(sourceMatches);
+		return sourceMatches;
 	},
-	_sketchMachine: function(original) {
+	_sketch: (function(original) {
 		if (original.slice(0,8) == "sketch>>" ) {
 			original = original.slice(8);
 		}
 //		console.log(original);
-		window.derp = original;
-		var lineRegExp =/(.+(\r\n|\n)?|\[\[(.*?)\]\](\r\n|\n)?)/g;
-		var sourceMatches = original.match(lineRegExp); //returns an array of all lines.
-//		console.log(sourceMatches);
+		var globalLineReg = /(^\[\[(.*?)\|(.*?)\]\]$|^.+$)/gm;
+		var localLineReg  = /(^\[\[(.*?)\|(.*?)\]\]$|^.+$)/;
+		var sourceMatches = original.match(globalLineReg); //returns an array of all lines and links.
+		console.log(sourceMatches);
 		var i;
-		try {
-			this.textExists = true;
-			for (i=0; i < sourceMatches.length; i++) {
-				if (sourceMatches[i].substring(0,2) == "[["){
-					//console.log(sourceMatches[i]);
-					sourceMatches[i] = "</ul>" + this._linkMachine(sourceMatches[i]) + "<ul>";
-					sourceMatches[i] = this._pageParser("sketch",sourceMatches[i],65);
-					//console.log(sourceMatches[i]);
 
-				} else if (sourceMatches[i].match(/\w/) === null){ //if there's no non-whitespace characters, kill it, let .join() sort it out.
-					delete sourceMatches[i];
-				} else {
-					//console.log(sourceMatches[i]);
-					sourceMatches[i] = this._pageParser("sketch",sourceMatches[i],60);
-					if (sourceMatches[i].substring(0,5) == "</ul>"){
-						sourceMatches[i] = sourceMatches[i] + "</li>";
-					} else {
-						sourceMatches[i] = '<li>' + sourceMatches[i] + "</li>";
-					}
-				}
-
-				//console.log(this.pageHeight.toString() + sourceMatches[i]);
+		for (i=0; i<sourceMatches.length; i++){
+			sourceMatches[i] = sourceMatches[i].match(localLineReg);
+			delete sourceMatches[i][0];
+			sourceMatches[i] = $.grep(sourceMatches[i],function(n){ return(n); });//kills all the undefineds. 
+			if (sourceMatches[i].length == 3) {
+				sourceMatches[i] = {text: sourceMatches[i][3], target: sourceMatches[i][1], style: "link"};
+			} else {
+				sourceMatches[i] = {ul: sourceMatches[i]};
 			}
-		} catch(err) {
-			console.log("derped!");
-			this.textExists = false;
 		}
-		//console.log(sourceMatches);
-		return "<ul>" + sourceMatches.join("") + "</ul>";
-	},
-
-	_linkMachine: function(original) { 	//insert code for links!
+		return sourceMatches;
+	}),
+	_linkMachine: (function(original) { 	//insert code for links!
 		var linkHunter = /\[\[(.*?)\]\]((\r\n|\n)*)/;
 		var liMat = original.match(linkHunter)[1]; //returns a string of "display|target"
 		var finishedLink;
@@ -202,10 +128,10 @@ _.extend(Passage.prototype, {
 			this.linksExist = false;
 		}
 		return finishedLink;
-	},
+	}),
 
 
-	_pageParser: function(t, c, w) { //t=type, c=content, w=width 
+	_pageParser: (function(t, c, w) { //t=type, c=content, w=width 
 		//This function automatically figures out how many pages that a passage uses and generates pages accordingly.
 		var npAtFront = false;
 		var result = '';
@@ -256,90 +182,7 @@ _.extend(Passage.prototype, {
 		} else {
 			return lineArr.join("");
 		}
-
-
-//Let's save this old, bad chunk of code for now.
-		/*	*****KNOWN ISSUE*****
-			The page parser can really only guess at what the final result will be, and it seems to find an arbitrary place
-			to put the pagemaking code each time. I need to figure out an exact way for the parser to guess accurately.
-			Until then, it works, just the distances between the pages and here the pages actually split seem arbitrary to the
-			end user.
-		*\///remove backslash to uncomment
-
-
-		var tempPassage = document.getElementById("passageConstruction");
-		tempPassage.innerHTML = ""; //Element needs to be cleared out before we can begin.
-		var tempHeight = 0;
-		var heightRegEx = /.*(\r\n|\n)?/g;
-		var wordRegEx = /
-		var itemArr = original.match(heightRegEx);
-		var heightSubtractor = 0;
-		var pageCounter = 1;
-		var result = '';
-		var pageDistance = [];
-		var newstring = '';
-		var changePageArr = [];
-		var firstPart = '';
-		var breakoff = '';
-		var secondPart = '';
-		var pageChangeArr = [];
-		var pageBreak = '';
-		//We need to build the "#passageConstruction" div character by character (used to be line by line), test the height, and add pages based on that height. To do that, we need to make the tempPassage workable. AKA not display: hidden;
-		tempPassage.style.position = "absolute";
-		tempPassage.style.visibility = "hidden";
-		tempPassage.style.display = "block";
-		tempPassage.style.width = "672px";
-		tempPassage.style.left = "0px";
-		tempPassage.style.top = "0px";
-		for (i=0; i<itemArr.length; i++) {//now combine 
-			
-
-
-
-
-			//let's not do things by individual characters... haha ha ha...
-
-
-
-
-			for (s=0; s<itemArr[i].length; s++) {
-				newstring = newstring + itemArr[i][s];
-				$("#passageConstruction").html(newstring);				
-				tempHeight = tempPassage.clientHeight;
-				if (tempHeight > 900) {
-					pageDistance = 972 - tempHeight + 82;
-					if (window.sketchMode === false ) {
-						//instead of breaking our flow, let's make a new object now and inject everything later.
-						//What we're doing is inserting the page break at the beginning of the word.
-						pageBreak = "</div><br /><div id=\"page\" style=\"position:relative;left:-73px;top:" + pageDistance + "px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div>\n";
-						pageChangeArr[pageCounter-1] = { index: i, text: pageBreak + itemArr[i]};
-						tempPassage.innerHTML = "";
-						newstring = "";
-						pageCounter = pageCounter + 1;
-					} else {
-						pageBreak = "</ul></div><br /><div id=\"page\"style=\"position:relative;left:-73px;top:" + pageDistance + "px;\"><ul>\n";
-						pageChangeArr[pageCounter-1] = { index: i, text: pageBreak + itemArr[i]};
-					}
-				}
-			}
-		}
-		for (i=0; i<pageChangeArr.length; i++) {
-			itemArr[pageChangeArr[i].index] = pageChangeArr[i].text;
-		}
-		i=0;
-		for (i=0; i<itemArr.length; i++) {
-			result = result + itemArr[i];		
-		} 
-		tempPassage.style.visibility = "hidden";
-		tempPassage.style.display = "none";
-		$(window).scrollTop(0); //it seems to work better here than anywhere else... go figure.
-		return result;*/
-	}//,
-	//_ifMachine: function(ifCond, elseIfCond: '', elseIfStart: 0, elseIfEnd: 0, totalArray, ifStart, ifEnd, elseStart: 0, elseEnd: 0) { //Am I seriously creating an if-then? Fuck. TODO:Also, figure out the format here...
-
-	
-	//} 
-
+	})
 });
 
 
