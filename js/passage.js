@@ -30,12 +30,12 @@ function Passage (id, name, tags, source) {
 _.extend(Passage.prototype, {
 
 
-	render: function(){
-
+	parsePassage: function(){
+		//this is the code that actually throws the stuff on screen
 		if (window.story.sketchMode === false){
-			this.stack = this._production(this.source);
+			this.stack = this._productionParser(_.unescape(this.source));
 		} else {
-			this.stack =  this._sketch(this.source);
+			this.stack =  this._sketchParser(_.unescape(this.source));
 		}
 		var passageDef = {
 			content: this.stack,
@@ -44,11 +44,72 @@ _.extend(Passage.prototype, {
 			pageMargins: window.story.pageMargins,
 			pageSize: window.story.pageSize
 		};
-		console.log(passageDef);
 		var parsedObj = pdfMake.createPdf(passageDef);
 		window.bypassError = true;		
-		console.log(parsedObj);
 		parsedObj._createDoc();
+
+	},
+
+
+	screenRender: function(){
+		//this is the code that actually formats the stuff that gets thrown up on screen. when testing, it always returns "derp"
+	var testing = false;
+	var stack = this.stack;
+	var i;
+	var s;
+	var currentPage = 1;
+	var fullBring = ''; //The concatenated var containing the full, rendered passage, complete with HTML markup. Also, a Bleach reference :D
+	for (i=0; i<stack.length; i++){   //.ul[0].text
+
+
+
+		if (stack[i].style == "sketch"){        //sketch, link, sch, tra, act,  dia, cha, par, more.
+			if (i === 0 || stack[i-1].style != "sketch"){
+				fullBring = fullBring + "<ul>";
+			}
+
+			for (s=0; s<stack[i].ul.length; s++){
+				fullBring = fullBring + "<li>" + stack[i].ul[s].text + "</li>";
+			}
+			if (!stack[i+1] || stack[i+1].style != "sketch"){
+				fullBring = fullBring + "</ul>";
+			}
+			for (s=0; s<stack[i].positions.length; s++){
+				if (stack[i].positions[s].pageNumber > currentPage) {
+					fullBring = fullBring + "</ul></div><br /><div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><ul>";
+					currentPage = stack[i].positions[s].pageNumber;
+				}
+			}
+		} else if (stack[i].style == "link"){
+			var target = stack[i].target;
+			var display = stack[i].text;
+
+			if (/^\w+:\/\/\/?\w/i.test(target)) {
+				fullBring = fullBring + '<div id="linkCont"><a href="' + target + '">' + display + '</a>' + '</div>';
+			} else {
+				fullBring = fullBring + '<div id="linkCont"><a href="javascript:void(0)" data-passage="' + _.escape(target) + '">' + _.escape(display) + '</a>' + '</div>';
+			}
+		} else if (stack[i].style == "sch"){
+
+		} else if (stack[i].style == "tra"){
+
+		} else if (stack[i].style == "act"){
+
+		} else if (stack[i].style == "dia"){
+
+		} else if (stack[i].style == "cha"){
+
+		} else if (stack[i].style == "par"){
+
+		}
+	}
+
+	if (testing === true){
+		return "derp";
+	} else {
+		return fullBring;
+	}
+
 	},
 
 
@@ -61,7 +122,7 @@ _.extend(Passage.prototype, {
 
 
 
-	_production: function(original){
+	_productionParser: function(original){
 	//Takes the original, unescaped string and turns it into an object array.
 		var lineRegExpG =/^((\w{3})(>>)(.*)$|\[\[(.*?)\|(.*?)\]\]$)/gm; //both the link grabber and the text grabber combined!
 		var lineRegExpL = /^((\w{3})(>>)(.*)$|\[\[(.*?)\|(.*?)\]\]$)/;
@@ -83,10 +144,9 @@ _.extend(Passage.prototype, {
 				sourceMatches[i] = {text: "There is a problem with this item.", style: "err"};
 			}
 		}
-		console.log(sourceMatches);
 		return sourceMatches;
 	},
-	_sketch: (function(original) {
+	_sketchParser: (function(original) {
 		if (original.slice(0,8) == "sketch>>" ) {
 			original = original.slice(8);
 		}
@@ -94,7 +154,6 @@ _.extend(Passage.prototype, {
 		var globalLineReg = /(^\[\[(.*?)\|(.*?)\]\]$|^.+$)/gm;
 		var localLineReg  = /(^\[\[(.*?)\|(.*?)\]\]$|^.+$)/;
 		var sourceMatches = original.match(globalLineReg); //returns an array of all lines and links.
-		console.log(sourceMatches);
 		var i;
 
 		for (i=0; i<sourceMatches.length; i++){
@@ -102,9 +161,9 @@ _.extend(Passage.prototype, {
 			delete sourceMatches[i][0];
 			sourceMatches[i] = $.grep(sourceMatches[i],function(n){ return(n); });//kills all the undefineds. 
 			if (sourceMatches[i].length == 3) {
-				sourceMatches[i] = {text: sourceMatches[i][3], target: sourceMatches[i][1], style: "link"};
+				sourceMatches[i] = {text: sourceMatches[i][1], target: sourceMatches[i][2], style: "link"};
 			} else {
-				sourceMatches[i] = {ul: sourceMatches[i]};
+				sourceMatches[i] = {ul: sourceMatches[i], style: "sketch"};
 			}
 		}
 		return sourceMatches;
@@ -131,7 +190,7 @@ _.extend(Passage.prototype, {
 	}),
 
 
-	_pageParser: (function(t, c, w) { //t=type, c=content, w=width 
+	_pageParser: (function(t, c, w) { //t=type, c=content, w=width //obsolete.
 		//This function automatically figures out how many pages that a passage uses and generates pages accordingly.
 		var npAtFront = false;
 		var result = '';

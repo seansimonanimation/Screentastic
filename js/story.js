@@ -74,7 +74,6 @@ function Story (raw){
 		var tags = $t.attr('tags');
 		c[id] = new Passage(id, $t.attr('name'), (tags !== '' && tags !== undefined) ? tags.split(' ') : [], $t.html());
 	});
-
 	// An array of user-specific scripts to run when the story is begun. @property userScripts @type Array
 	this.userScripts = _.map(raw.children('*[type="text/twine-javascript"]'), function (raw){
 		return $(raw).html();
@@ -254,6 +253,8 @@ _.extend(Story.prototype,
 
 		$.event.trigger('hidepassage', { passage: window.passage });
 
+		//A fun little scroll to the top of the page, for the next passage.
+		$('html, body').animate({ scrollTop: 0 }, 'fast');
 		/*
 		 Triggered whenever a passage is about to be shown onscreen. The passage being displayed is stored in the passage property of the event. @event showpassage
 		*/
@@ -264,7 +265,8 @@ _.extend(Story.prototype,
 			this.history.push(passage.id);
 		}
 		window.passage = passage;
-		$('#page').html(passage.render()); //showing event. Displays the unescaped text from the browser section of the passage.
+
+		$('#page').html(passage.screenRender()); //showing event. Displays the unescaped text from the browser section of the passage.
 
 		/*
 		 Triggered after a passage has been shown onscreen, and is now displayed in the div with id passage. The passage being displayed is stored in the passage property of the event. @event showpassage:after
@@ -281,8 +283,8 @@ _.extend(Story.prototype,
 		var passage = this.passage(idOrName);
 
 		if (! passage)
-			throw new Error('There is no passage with the ID or name ' + idOrName);
+			throw new Error('There is no passage with the ID or name \"' + idOrName + "\"");
 
-		return passage.render();
+		return passage.screenRender();
 	}
 });
