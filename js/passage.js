@@ -138,7 +138,7 @@ _.extend(Passage.prototype, {
 				sourceMatches[i] = {text: sourceMatches[i][3], style: sourceMatches[i][1]};
 			} else if (sourceMatches[i].length == 3){
 			//regular items should have 4 items in their array at this point. Format: ["[[target|display]]","target","display"]
-				sourceMatches[i] = {text: sourceMatches[i][3], target: sourceMatches[i][1], style: "link"};
+				sourceMatches[i] = {text: sourceMatches[i][1], target: sourceMatches[i][2], style: "link"};
 
 			} else {
 				sourceMatches[i] = {text: "There is a problem with this item.", style: "err"};
