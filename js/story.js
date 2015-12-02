@@ -97,6 +97,10 @@ _.extend(Story.prototype,
 
 	start: function()
 	{
+		//format all the things!
+
+
+
 		//$('#page').html('Building your story');
 		// set up history event handler
 
@@ -264,7 +268,7 @@ _.extend(Story.prototype,
 			this.history.push(passage.id);
 		}
 		window.passage = passage;
-		$('#page').html(passage.render()); //showing event. Displays the unescaped text from the browser section of the passage.
+		$('#page').html("derp"); //showing event. Displays the unescaped text from the browser section of the passage.
 
 		/*
 		 Triggered after a passage has been shown onscreen, and is now displayed in the div with id passage. The passage being displayed is stored in the passage property of the event. @event showpassage:after

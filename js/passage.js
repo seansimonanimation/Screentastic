@@ -44,10 +44,10 @@ _.extend(Passage.prototype, {
 			pageMargins: window.story.pageMargins,
 			pageSize: window.story.pageSize
 		};
-		console.log(passageDef);
+		//console.log(passageDef);
 		var parsedObj = pdfMake.createPdf(passageDef);
 		window.bypassError = true;		
-		console.log(parsedObj);
+		//console.log(parsedObj);
 		parsedObj._createDoc();
 	},
 
@@ -77,32 +77,33 @@ _.extend(Passage.prototype, {
 				sourceMatches[i] = {text: sourceMatches[i][3], style: sourceMatches[i][1]};
 			} else if (sourceMatches[i].length == 3){
 			//regular items should have 4 items in their array at this point. Format: ["[[target|display]]","target","display"]
-				sourceMatches[i] = {text: sourceMatches[i][3], target: sourceMatches[i][1], style: "link"};
+				sourceMatches[i] = {text: sourceMatches[i][2], target: sourceMatches[i][1], style: "link"};
 
 			} else {
 				sourceMatches[i] = {text: "There is a problem with this item.", style: "err"};
 			}
 		}
-		console.log(sourceMatches);
+		//console.log(sourceMatches);
 		return sourceMatches;
 	},
 	_sketch: (function(original) {
 		if (original.slice(0,8) == "sketch>>" ) {
 			original = original.slice(8);
 		}
-//		console.log(original);
+		//console.log(original);
 		var globalLineReg = /(^\[\[(.*?)\|(.*?)\]\]$|^.+$)/gm;
 		var localLineReg  = /(^\[\[(.*?)\|(.*?)\]\]$|^.+$)/;
 		var sourceMatches = original.match(globalLineReg); //returns an array of all lines and links.
-		console.log(sourceMatches);
+		//console.log(sourceMatches);
 		var i;
 
 		for (i=0; i<sourceMatches.length; i++){
 			sourceMatches[i] = sourceMatches[i].match(localLineReg);
 			delete sourceMatches[i][0];
-			sourceMatches[i] = $.grep(sourceMatches[i],function(n){ return(n); });//kills all the undefineds. 
-			if (sourceMatches[i].length == 3) {
-				sourceMatches[i] = {text: sourceMatches[i][3], target: sourceMatches[i][1], style: "link"};
+			sourceMatches[i] = $.grep(sourceMatches[i],function(n){ return(n); });//kills all the undefineds.
+			//console.log(sourceMatches[i]); 
+			if (sourceMatches[i].length == 3) { //'tis but a link!
+				sourceMatches[i] = {text: sourceMatches[i][1], target: sourceMatches[i][2], style: "link"};
 			} else {
 				sourceMatches[i] = {ul: sourceMatches[i]};
 			}
