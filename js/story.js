@@ -20,7 +20,7 @@ function Story (raw){
 			margin: [0,10, 0, 0]
 		},
 		cha: {	margin: [190, 10, 144, 0]},
-		dia: {	margin: [110, 0, 110, 0], width: 324},
+		dia: {	margin: [130, 0, 200, 0], width: 324},
 		act: {	margin: [0, 10, 0, 0]},
 		par: {	margin: [144,0,110,0]},
 		link: {

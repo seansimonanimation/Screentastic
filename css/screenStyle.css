@@ -37,7 +37,6 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 	width: 600px;
 	text-transform: uppercase;
 	margin-top: 20px;
-	word-wrap: break-word;
 
 }
 
@@ -50,7 +49,6 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 	text-transform: uppercase;
 	text-align: right;
 	margin-top: 20px;
-	word-wrap: break-word;
 
 }
 
@@ -61,17 +59,14 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 	margin-left: 69px;
 	width: 600px;
 	margin-top: 20px;
-	word-wrap: break-word;
 
 }
 
 #diaCont {
-	/*character length: 33*/
+	/*character length: 34*/
 	position: relative;
 	display: block;
-	margin-left: 180px;
-	width: 324px;		
-	word-wrap: break-word;
+	margin-left: 180px;	
 
 }
 
@@ -83,7 +78,6 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 	width: 250px;
 	text-transform: uppercase;
 	margin-top: 20px;
-	word-wrap: break-word;
 }
 
 #parCont {
@@ -92,7 +86,6 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 	display: block;
 	margin-left: 212px;
 	width: 250px;
-	word-wrap: break-word;
 
 }
 
@@ -102,10 +95,14 @@ body { font-family: 'CourierPrime'; background: #AAA; }
 	margin-left: 69px;
 	width: 600px;
 	margin-top: 20px;
-	word-wrap: break-word;
 
 }
+#more {
+	position: relative;
+	display: block;
+	margin-left: 300px;
 
+}
 
 ul {
 	word-wrap: break-word;

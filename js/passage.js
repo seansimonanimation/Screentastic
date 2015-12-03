@@ -53,63 +53,170 @@ _.extend(Passage.prototype, {
 
 	screenRender: function(){
 		//this is the code that actually formats the stuff that gets thrown up on screen. when testing, it always returns "derp"
-	var testing = false;
-	var stack = this.stack;
-	var i;
-	var s;
-	var currentPage = 1;
-	var fullBring = ''; //The concatenated var containing the full, rendered passage, complete with HTML markup. Also, a Bleach reference :D
-	for (i=0; i<stack.length; i++){   //.ul[0].text
-
-
-
-		if (stack[i].style == "sketch"){        //sketch, link, sch, tra, act,  dia, cha, par, more.
-			if (i === 0 || stack[i-1].style != "sketch"){
-				fullBring = fullBring + "<ul>";
+		var testing = false;
+		var stack = this.stack;
+		var i;
+		var s;
+		var currentPage = 1;
+		var fullBring = ''; //The concatenated var containing the full, rendered passage, complete with HTML markup. Also, a Bleach reference :D
+		for (i=0; i<stack.length; i++){
+			if (stack[i].text[0] == " "){
+				stack[i].text = stack[i].text.slice(1);
 			}
+			//console.log(stack[i].style);
+			if (stack[i].style == "sketch"){        //sketch, link, sch, tra, act,  dia, cha, par, more.
+				if (i === 0 || stack[i-1].style != "sketch"){
+					fullBring = fullBring + "<ul>";
+				}
+	
+				for (s=0; s<stack[i].ul.length; s++){
+					fullBring = fullBring + "<li>" + stack[i].ul[s].text + "</li>";
+				}
+				if (!stack[i+1] || stack[i+1].style != "sketch"){
+					fullBring = fullBring + "</ul>";
+				}
+				for (s=0; s<stack[i].positions.length; s++){
+					if (stack[i].positions[s].pageNumber > currentPage) {
+						fullBring = fullBring + "</ul></div><br /><div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><ul>";
+						currentPage = stack[i].positions[s].pageNumber;
+					}
+				}
+			} else if (stack[i].style == "link"){
+				var target = stack[i].target;
+				var display = stack[i].text;
+	
+				if (/^\w+:\/\/\/?\w/i.test(target)) {
+					fullBring = fullBring + '<div id="linkCont"><a href="' + target + '">' + display + '</a>' + '</div>';
+				} else {
+					fullBring = fullBring + '<div id="linkCont"><a href="javascript:void(0)" data-passage="' + _.escape(target) + '">' + _.escape(display) + '</a>' + '</div>';
+				}
+			} else if (stack[i].style == "sch"){ //62
+				
 
-			for (s=0; s<stack[i].ul.length; s++){
-				fullBring = fullBring + "<li>" + stack[i].ul[s].text + "</li>";
-			}
-			if (!stack[i+1] || stack[i+1].style != "sketch"){
-				fullBring = fullBring + "</ul>";
-			}
-			for (s=0; s<stack[i].positions.length; s++){
-				if (stack[i].positions[s].pageNumber > currentPage) {
-					fullBring = fullBring + "</ul></div><br /><div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><ul>";
-					currentPage = stack[i].positions[s].pageNumber;
+
+
+
+			} else if (stack[i].style == "tra"){ //62
+	
+			} else if (stack[i].style == "act"){ //62
+
+			} else if (stack[i].style == "cha"){ //38
+				stack[i].text = stack[i].text.toUpperCase();
+				if (stack[i].positions.length == 1){
+					diaArr[0] = stack[i].text;
+				} else {
+					for (s=0; s<stack[i].text.length; s+=38){
+						if (s===0){
+							chaArr[ss] = stack[i].text.substring(0,38);
+						} else {
+							chaArr[ss] = stack[i].text.substring(s,s+38);
+						}
+						ss++;
+					}
+				}
+				if (chaArr.length != 1) {
+					for (s=0;s<chaArr.length-1;s++){
+						chaArr[s+1] = diaArr[s].slice(diaArr[s].lastIndexOf(" ") + 1) + diaArr[s+1];
+						chaArr[s] = diaArr[s].slice(0,diaArr[s].lastIndexOf(" "));
+					}
+				}
+				for (s=0; s<chaArr.length; s++){
+
+					if (s===0 && chaArr.length != 1){ //at the beginning, multiline
+						if (stack[i].positions[s].pageNumber > currentPage){
+
+						} else {
+
+
+						}
+					
+					} else if (s !==0 && s == (chaArr.length-1)){ //at the end, multiline
+						if (stack[i].positions[s].pageNumber > currentPage){
+
+						} else {
+
+
+						}
+					} else if (s === 0 && chaArr.length == 1) { //single line
+						if (stack[i].positions[s].pageNumber > currentPage){
+
+						} else {
+
+
+						}
+
+					} else { //somewhere in the middle, multiline.
+						if (stack[i].positions[s].pageNumber > currentPage){
+
+						} else {
+
+
+						}
+					}
+				}
+			} else if (stack[i].style == "dia"){ //34
+				var diaArr = [];
+				var ss = 0;
+				if (stack[i].positions.length == 1){
+					diaArr[0] = stack[i].text;
+				} else {
+					for (s=0; s<stack[i].text.length; s+=34){
+						if (s===0){
+							diaArr[ss] = stack[i].text.substring(0,34);
+						} else {
+							diaArr[ss] = stack[i].text.substring(s,s+34);
+						}
+						ss++;
+					}
+				}
+				if (diaArr.length != 1) {
+					for (s=0;s<diaArr.length-1;s++){
+						diaArr[s+1] = diaArr[s].slice(diaArr[s].lastIndexOf(" ") + 1) + diaArr[s+1];
+						diaArr[s] = diaArr[s].slice(0,diaArr[s].lastIndexOf(" "));
+					}
+				}
+				for (s=0; s<diaArr.length; s++){
+					if (s===0 && diaArr.length != 1){ //at the beginning, multiline
+						if (stack[i].positions[s].pageNumber > currentPage){
+							fullBring = fullBring.substring(0,fullBring.lastIndexOf("<div id=\"diaCont\">")) + "<div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div>" + fullBring.substring(fullBring.lastIndexOf("<div id=\"diaCont\">"));
+							currentPage++;
+						} else {
+							fullBring = fullBring + "<div id=\"diaCont\">" + diaArr[s] + "<br />";
+						}
+					} else if (s !==0 && s == (diaArr.length-1)){ //at the end, multiline
+						if (stack[i].positions[s-1].pageNumber > currentPage){
+							fullBring = fullBring + diaArr[s] + "</div><div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div>";
+							currentPage++;
+						} else {
+							fullBring = fullBring + diaArr[s] + "</div>";
+						}
+
+					} else if (s === 0 && diaArr.length == 1) { //single line
+						if (stack[i].positions[0].pageNumber > currentPage){
+							console.log(stack[i].positions[s].pageNumber , currentPage);
+							fullBring = fullBring + "<div id=\"diaCont\">!Single Line!</div><div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div>"; //for testing right now... Requires the use of cha.
+							//fullBring = fullBring.substring(0,fullBring.lastIndexOf("<div id=\"cha\">")) + "<div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1>" + fullBring.substring(fullBring.lastIndexOf("<div id=\"cha\">")) + diaArr[0] + "</div>";
+							currentPage++;
+						} else {
+							fullBring = fullBring + "<div id=\"diaCot\">" + diaArr[s] + "</div>";
+						}
+					} else { //somewhere in the middle, multiline.
+						if (stack[i].positions[s-1].pageNumber > currentPage){
+							fullBring = fullBring + "</div><div id=\"more\">[MORE]</div><div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div><div id=\"more\">[CONTINUED]</div><div id=\"diaCont\">" + diaArr[s] + "<br />";
+
+						} else {
+							fullBring = fullBring + diaArr[s] + "<br />";
+						}
+					}
 				}
 			}
-		} else if (stack[i].style == "link"){
-			var target = stack[i].target;
-			var display = stack[i].text;
-
-			if (/^\w+:\/\/\/?\w/i.test(target)) {
-				fullBring = fullBring + '<div id="linkCont"><a href="' + target + '">' + display + '</a>' + '</div>';
-			} else {
-				fullBring = fullBring + '<div id="linkCont"><a href="javascript:void(0)" data-passage="' + _.escape(target) + '">' + _.escape(display) + '</a>' + '</div>';
-			}
-		} else if (stack[i].style == "sch"){
-
-		} else if (stack[i].style == "tra"){
-
-		} else if (stack[i].style == "act"){
-
-		} else if (stack[i].style == "dia"){
-
-		} else if (stack[i].style == "cha"){
-
-		} else if (stack[i].style == "par"){
-
 		}
-	}
-
-	if (testing === true){
-		return "derp";
-	} else {
-		return fullBring;
-	}
-
+		//console.log(fullBring);
+		if (testing === true){
+			return "derp";
+		} else {
+			return fullBring;
+		}
 	},
 
 
