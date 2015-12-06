@@ -63,7 +63,6 @@ _.extend(Passage.prototype, {
 			if (stack[i].text[0] == " "){
 				stack[i].text = stack[i].text.slice(1);
 			}
-			//console.log(stack[i].style);
 			if (stack[i].style == "sketch"){        //sketch, link, sch, tra, act,  dia, cha, par, more.
 				if (i === 0 || stack[i-1].style != "sketch"){
 					fullBring = fullBring + "<ul>";
@@ -90,127 +89,17 @@ _.extend(Passage.prototype, {
 				} else {
 					fullBring = fullBring + '<div id="linkCont"><a href="javascript:void(0)" data-passage="' + _.escape(target) + '">' + _.escape(display) + '</a>' + '</div>';
 				}
-			} else if (stack[i].style == "sch"){ //62
-				var schArr = [];
-				stack[i].text = stack[i].text.toUpperCase();
-				if (stack[i].positions.length == 1){
-					diaArr[0] = stack[i].text;
-				} else {
-					for (s=0; s<stack[i].text.length; s+=62){
-						if (s===0){
-							schArr[ss] = stack[i].text.substring(0,62);
-						} else {
-							schArr[ss] = stack[i].text.substring(s,s+62);
-						}
-						ss++;
-					}
+			} else if (stack[i].style == "sch" || stack[i].style == "tra" || stack[i].style == "act" || stack[i].style == "cha"){
+				if (i==2){
+					console.log(stack[i].text, stack[i].positions, stack[i].style, currentPage);
 				}
-
-				if (schArr.length != 1) {
-					for (s=0;s<schArr.length-1;s++){
-						schArr[s+1] = diaArr[s].slice(schArr[s].lastIndexOf(" ") + 1) + schArr[s+1];
-						schArr[s] = diaArr[s].slice(0,schArr[s].lastIndexOf(" "));
-					}
+				var result = "derp";
+				
+				//var result = this._formatArray(stack[i].text, stack[i].positions, stack[i].style, currentPage);    // return [addPageLine + output, addingPages];
+				if ( result[1] === true) {
+					currentPage++;
 				}
-				for (s=0; s<schArr.length; s++){
-
-					if (s===0 && schArr.length != 1){ //at the beginning, multiline
-						if (stack[i].positions[s].pageNumber > currentPage){
-
-						} else {
-
-
-						}
-					
-					} else if (s !==0 && s == (schArr.length-1)){ //at the end, multiline
-						if (stack[i].positions[s].pageNumber > currentPage){
-
-						} else {
-
-
-						}
-					} else if (s === 0 && schArr.length == 1) { //single line
-						if (stack[i].positions[s].pageNumber > currentPage){
-
-						} else {
-
-
-						}
-
-					} else { //somewhere in the middle, multiline.
-						if (stack[i].positions[s].pageNumber > currentPage){
-
-						} else {
-
-
-						}
-					}
-				}
-			} else if (stack[i].style == "tra"){ //62
-				var traArr = [];
-
-
-			} else if (stack[i].style == "act"){ //62
-				var actArr = [];
-			} else if (stack[i].style == "cha"){ //38
-				var chaArr = [];
-				stack[i].text = stack[i].text.toUpperCase();
-				if (stack[i].positions.length == 1){
-					chaArr[0] = stack[i].text;
-				} else {
-					for (s=0; s<stack[i].text.length; s+=38){
-						if (s===0){
-							chaArr[ss] = stack[i].text.substring(0,38);
-						} else {
-							chaArr[ss] = stack[i].text.substring(s,s+38);
-						}
-						ss++;
-					}
-				}
-				if (chaArr.length != 1) {
-					for (s=0;s<chaArr.length-1;s++){
-						chaArr[s+1] = diaArr[s].slice(diaArr[s].lastIndexOf(" ") + 1) + diaArr[s+1];
-						chaArr[s] = diaArr[s].slice(0,diaArr[s].lastIndexOf(" "));
-					}
-				}
-				for (s=0; s<chaArr.length; s++){
-
-					if (s===0 && chaArr.length != 1){ //at the beginning, multiline
-						var newPage = false;
-						for (ss=0; ss<chaArr.length; ss++){
-							if (stack[i].positions[ss].pageNumber > currentPage){
-								fullBring = fullBring +"<div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div><div id=\"chaCont\">" + chaArr[s] + "<br />";
-								currentPage++;
-								newPage = true;
-							}
-						}
-
-						if (newPage === false){
-							fullBring = fullBring + <div id=\"chaCont\">" + chaArr[s] + "</br />";
-						}
-					} else if (s !==0 && s == (chaArr.length-1)){ //at the end, multiline
-						if (stack[i].positions[s].pageNumber > currentPage){
-
-						} else {
-
-
-						}
-					} else if (s === 0 && chaArr.length == 1) { //single line
-						if (stack[i].positions[s].pageNumber > currentPage){
-							fullBring = fullBring + "<div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div><div id=\"chaCont\">" + chaArr[0] + "</div>";
-						} else {
-							fullBring = fullBring + "div id=\"chaCont\">" + chaArr[0] + "</div>";
-						}
-
-					} else { //somewhere in the middle, multiline.
-						if (stack[i].positions[s].pageNumber > currentPage){
-
-						} else {
-
-
-						}
-					}
-				}
+				fullBring = fullBring + result[0];
 			} else if (stack[i].style == "dia"){ //34
 				var diaArr = [];
 				var ss = 0;
@@ -250,9 +139,7 @@ _.extend(Passage.prototype, {
 
 					} else if (s === 0 && diaArr.length == 1) { //single line
 						if (stack[i].positions[0].pageNumber > currentPage){
-							console.log(stack[i].positions[s].pageNumber , currentPage);
-							fullBring = fullBring + "<div id=\"diaCont\">!Single Line!</div><div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div>"; //for testing right now... Requires the use of cha.
-							//fullBring = fullBring.substring(0,fullBring.lastIndexOf("<div id=\"cha\">")) + "<div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1>" + fullBring.substring(fullBring.lastIndexOf("<div id=\"cha\">")) + diaArr[0] + "</div>";
+							fullBring = fullBring.substring(0,fullBring.lastIndexOf("<div id=\"cha\">")) + "<div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1>" + fullBring.substring(fullBring.lastIndexOf("<div id=\"cha\">")) + diaArr[0] + "</div>";
 							currentPage++;
 						} else {
 							fullBring = fullBring + "<div id=\"diaCot\">" + diaArr[s] + "</div>";
@@ -268,12 +155,7 @@ _.extend(Passage.prototype, {
 				}
 			}
 		}
-		//console.log(fullBring);
-		if (testing === true){
-			return "derp";
-		} else {
-			return fullBring;
-		}
+		return fullBring;
 	},
 
 
@@ -284,6 +166,97 @@ _.extend(Passage.prototype, {
 	 A helper function that is connected to passage templates as $. It acts like the jQuery $ function, running a script when the passage is ready in the DOM. The function passed is also bound to div#page for convenience. If this is *not* passed a single function, then this acts as a passthrough to jQuery's native $ function. @method _readyFunc @return jQuery object, as with jQuery() @private
 	*/
 
+
+	_formatArray: function(input, positions, lineType, page) {
+		//This function formats non-dialogue-driving lines: AKA cha, act, sch, tra. par and dia are handled within the parent function.
+		var inputArr = [];
+		var output = '';
+		var i=0;
+		var s=0;
+		var ss=0;
+		var lineLength;
+		var addPageLine = '';
+		var addingPages = false;
+		if (typeof(input) != "string" || typeof(positions) !="object" || typeof(lineType) != "string") {
+			return "Something is wrong with your inputs.";
+		}
+		switch (lineType) {
+			case "cha":
+				lineLength = 34;
+				break;
+			case "act":
+				lineLength = 65;
+				break;
+			case "sch":
+				lineLength = 65;
+				break;
+			case "tra":
+				lineLength = 65;
+				break;
+		}
+		if (lineType == "cha" || lineType == "sch" || lineType == "tra"){
+			input = input.toUpperCase();
+		} 
+
+		if (positions.length == 1){
+			inputArr[0] = input;
+		} else {
+			ss=0;			
+			for (i=0; ss<input.length; i+=lineLength){
+				if (i===0){
+					inputArr[ss] = input.substring(0,lineLength);
+				} else {
+					inputArr[ss] = input.substring(i,i+lineLength);
+				}
+				ss++;
+				if (inputArr[ss] == ""){
+					delete inputArr[ss];
+					break;
+				}
+			}
+		}
+		for (i=0; i<inputArr.length; i++){
+			if (inputArr[i] == ""){
+				delete inputArr[i];
+			}
+		}
+		inputArr = $.grep(inputArr,function(n){ return(n); });//kills all the undefineds. 
+
+		console.log(inputArr);
+		if (inputArr.length != 1) {
+			for (s=0;s<inputArr.length-1;s++){
+				console.log(inputArr[s]);
+				inputArr[s+1] = inputArr[s].slice(inputArr[s].lastIndexOf(" ") + 1) + inputArr[s+1];
+				inputArr[s] = inputArr[s].slice(0,inputArr[s].lastIndexOf(" "));
+
+			}
+		} // all lines have nothing but full words now.
+		for (s=0; s<inputArr.length; s++){
+			if (positions[s].pageNumber > page){
+				//always put it at the beginning...
+				addPageLine = "<div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div><div id=\"chaCont\">";
+				addingPages = true;
+				page++;
+				break;
+			} else {
+				addPageLine = '';
+			}
+		}
+		for (i=0; i<inputArr.length; i++){
+			if (inputArr.length == 1){
+				output = "<div id=\"" + lineType + "\">" + inputArr[i] + "</div>";
+			} else {
+				if (i === 0) {
+					output = "<div id=\"" + lineType + "\">" + inputArr[i] + "<br />";
+				} else if (i == inputArr.length-1){
+					output = output + inputArr[i] + "</div>";
+				} else {
+					output = output + inputArr[i] + "<br />";
+				}
+			}
+		}
+		return [addPageLine + output, addingPages];
+	},
 
 
 	_productionParser: function(original){
@@ -310,6 +283,7 @@ _.extend(Passage.prototype, {
 		}
 		return sourceMatches;
 	},
+
 	_sketchParser: (function(original) {
 		if (original.slice(0,8) == "sketch>>" ) {
 			original = original.slice(8);
