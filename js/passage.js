@@ -91,19 +91,72 @@ _.extend(Passage.prototype, {
 					fullBring = fullBring + '<div id="linkCont"><a href="javascript:void(0)" data-passage="' + _.escape(target) + '">' + _.escape(display) + '</a>' + '</div>';
 				}
 			} else if (stack[i].style == "sch"){ //62
-				
-
-
-
-
-			} else if (stack[i].style == "tra"){ //62
-	
-			} else if (stack[i].style == "act"){ //62
-
-			} else if (stack[i].style == "cha"){ //38
+				var schArr = [];
 				stack[i].text = stack[i].text.toUpperCase();
 				if (stack[i].positions.length == 1){
 					diaArr[0] = stack[i].text;
+				} else {
+					for (s=0; s<stack[i].text.length; s+=62){
+						if (s===0){
+							schArr[ss] = stack[i].text.substring(0,62);
+						} else {
+							schArr[ss] = stack[i].text.substring(s,s+62);
+						}
+						ss++;
+					}
+				}
+
+				if (schArr.length != 1) {
+					for (s=0;s<schArr.length-1;s++){
+						schArr[s+1] = diaArr[s].slice(schArr[s].lastIndexOf(" ") + 1) + schArr[s+1];
+						schArr[s] = diaArr[s].slice(0,schArr[s].lastIndexOf(" "));
+					}
+				}
+				for (s=0; s<schArr.length; s++){
+
+					if (s===0 && schArr.length != 1){ //at the beginning, multiline
+						if (stack[i].positions[s].pageNumber > currentPage){
+
+						} else {
+
+
+						}
+					
+					} else if (s !==0 && s == (schArr.length-1)){ //at the end, multiline
+						if (stack[i].positions[s].pageNumber > currentPage){
+
+						} else {
+
+
+						}
+					} else if (s === 0 && schArr.length == 1) { //single line
+						if (stack[i].positions[s].pageNumber > currentPage){
+
+						} else {
+
+
+						}
+
+					} else { //somewhere in the middle, multiline.
+						if (stack[i].positions[s].pageNumber > currentPage){
+
+						} else {
+
+
+						}
+					}
+				}
+			} else if (stack[i].style == "tra"){ //62
+				var traArr = [];
+
+
+			} else if (stack[i].style == "act"){ //62
+				var actArr = [];
+			} else if (stack[i].style == "cha"){ //38
+				var chaArr = [];
+				stack[i].text = stack[i].text.toUpperCase();
+				if (stack[i].positions.length == 1){
+					chaArr[0] = stack[i].text;
 				} else {
 					for (s=0; s<stack[i].text.length; s+=38){
 						if (s===0){
@@ -123,13 +176,18 @@ _.extend(Passage.prototype, {
 				for (s=0; s<chaArr.length; s++){
 
 					if (s===0 && chaArr.length != 1){ //at the beginning, multiline
-						if (stack[i].positions[s].pageNumber > currentPage){
-
-						} else {
-
-
+						var newPage = false;
+						for (ss=0; ss<chaArr.length; ss++){
+							if (stack[i].positions[ss].pageNumber > currentPage){
+								fullBring = fullBring +"<div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div><div id=\"chaCont\">" + chaArr[s] + "<br />";
+								currentPage++;
+								newPage = true;
+							}
 						}
-					
+
+						if (newPage === false){
+							fullBring = fullBring + <div id=\"chaCont\">" + chaArr[s] + "</br />";
+						}
 					} else if (s !==0 && s == (chaArr.length-1)){ //at the end, multiline
 						if (stack[i].positions[s].pageNumber > currentPage){
 
@@ -139,10 +197,9 @@ _.extend(Passage.prototype, {
 						}
 					} else if (s === 0 && chaArr.length == 1) { //single line
 						if (stack[i].positions[s].pageNumber > currentPage){
-
+							fullBring = fullBring + "<div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div><div id=\"chaCont\">" + chaArr[0] + "</div>";
 						} else {
-
-
+							fullBring = fullBring + "div id=\"chaCont\">" + chaArr[0] + "</div>";
 						}
 
 					} else { //somewhere in the middle, multiline.
