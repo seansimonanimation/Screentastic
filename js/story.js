@@ -59,7 +59,8 @@ function Story (raw){
 
 	//Find out if we're in sketchmode.
 	this.sketchMode = (function() {
-		if ($("#page").text().includes("sketch>>")) {
+		var sketchRE = /sketch>>/;
+		if ($("#page").text().match(sketchRE) !== null) {
 			return true;
 		}
 		return false;

@@ -60,6 +60,7 @@ _.extend(Passage.prototype, {
 		var currentPage = 1;
 		var fullBring = ''; //The concatenated var containing the full, rendered passage, complete with HTML markup. Also, a Bleach reference :D
 		for (i=0; i<stack.length; i++){
+
 			if (stack[i].text[0] == " "){
 				stack[i].text = stack[i].text.slice(1);
 			}
@@ -76,7 +77,7 @@ _.extend(Passage.prototype, {
 				}
 				for (s=0; s<stack[i].positions.length; s++){
 					if (stack[i].positions[s].pageNumber > currentPage) {
-						fullBring = fullBring + "</ul></div><br /><div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><ul>";
+						fullBring = fullBring + "</ul></div><br /><div id=\"page\" style=\"position:absolute;margin-left:50%;top:" + JSON.stringify((currentPage*972)+164) + "px;\"><ul>";
 						currentPage = stack[i].positions[s].pageNumber;
 					}
 				}
@@ -85,18 +86,18 @@ _.extend(Passage.prototype, {
 				var display = stack[i].text;
 	
 				if (/^\w+:\/\/\/?\w/i.test(target)) {
-					fullBring = fullBring + '<div id="linkCont"><a href="' + target + '">' + display + '</a>' + '</div>';
+					fullBring = fullBring + '<p id="linkCont"><a href="' + target + '">' + display + '</a>' + '</p>';
 				} else {
-					fullBring = fullBring + '<div id="linkCont"><a href="javascript:void(0)" data-passage="' + _.escape(target) + '">' + _.escape(display) + '</a>' + '</div>';
+					fullBring = fullBring + '<p id="linkCont"><a href="javascript:void(0)" data-passage="' + _.escape(target) + '">' + _.escape(display) + '</a>' + '</p>';
 				}
 			} else if (stack[i].style == "sch" || stack[i].style == "tra" || stack[i].style == "act" || stack[i].style == "cha"){
-				if (i==2){
-					console.log(stack[i].text, stack[i].positions, stack[i].style, currentPage);
-				}
-				var result = "derp";
+				//if (i==2){
+					//console.log(stack[i].text, stack[i].positions, stack[i].style, currentPage);
+				//}
+				//var result = "derp";
 				
-				//var result = this._formatArray(stack[i].text, stack[i].positions, stack[i].style, currentPage);    // return [addPageLine + output, addingPages];
-				if ( result[1] === true) {
+				var result = this._formatArray(stack[i].text, stack[i].positions, stack[i].style, currentPage);    // return [addPageLine + output, addingPages];
+				if ( result[1] > currentPage) {
 					currentPage++;
 				}
 				fullBring = fullBring + result[0];
@@ -124,29 +125,35 @@ _.extend(Passage.prototype, {
 				for (s=0; s<diaArr.length; s++){
 					if (s===0 && diaArr.length != 1){ //at the beginning, multiline
 						if (stack[i].positions[s].pageNumber > currentPage){
-							fullBring = fullBring.substring(0,fullBring.lastIndexOf("<div id=\"diaCont\">")) + "<div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div>" + fullBring.substring(fullBring.lastIndexOf("<div id=\"diaCont\">"));
+							fullBring = fullBring.substring(0,fullBring.lastIndexOf("<p id=\"chaCont\">")) + "</div></div><div id=\"pageCenter\" style=\"top:" + JSON.stringify((currentPage*972)+164) + "px;\"><div id=\"page\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div>" + fullBring.substring(fullBring.lastIndexOf("<p id=\"chaCont\">"));
 							currentPage++;
+							console.log("This one!");
 						} else {
-							fullBring = fullBring + "<div id=\"diaCont\">" + diaArr[s] + "<br />";
+							fullBring = fullBring + "<p id=\"diaCont\">" + diaArr[s] + "<br />";
 						}
 					} else if (s !==0 && s == (diaArr.length-1)){ //at the end, multiline
 						if (stack[i].positions[s-1].pageNumber > currentPage){
-							fullBring = fullBring + diaArr[s] + "</div><div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div>";
+							fullBring = fullBring + diaArr[s] + "</p></div></div><div id=\"pageCenter\" style=\"top:" + JSON.stringify((currentPage*972)+164) + "px;\"><div id=\"page\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div>";
 							currentPage++;
+							console.log("This one!");
+
 						} else {
-							fullBring = fullBring + diaArr[s] + "</div>";
+							fullBring = fullBring + diaArr[s] + "</p>";
 						}
 
 					} else if (s === 0 && diaArr.length == 1) { //single line
 						if (stack[i].positions[0].pageNumber > currentPage){
-							fullBring = fullBring.substring(0,fullBring.lastIndexOf("<div id=\"cha\">")) + "<div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1>" + fullBring.substring(fullBring.lastIndexOf("<div id=\"cha\">")) + diaArr[0] + "</div>";
+							fullBring = fullBring.substring(0,fullBring.lastIndexOf("<p id=\"chaCont\">")) + "</div></div><div id=\"pageCenter\" </div><div id=\"pageCenter\" style=\"top:" + JSON.stringify((currentPage*972)+164) + "px;\"><div id=\"page\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1>" + fullBring.substring(fullBring.lastIndexOf("<p id=\"cha\">")) + diaArr[0] + "</p>";
 							currentPage++;
+							console.log("This one!");
+
 						} else {
-							fullBring = fullBring + "<div id=\"diaCot\">" + diaArr[s] + "</div>";
+							fullBring = fullBring + "<p id=\"diaCont\">" + diaArr[s] + "</p>";
 						}
 					} else { //somewhere in the middle, multiline.
 						if (stack[i].positions[s-1].pageNumber > currentPage){
-							fullBring = fullBring + "</div><div id=\"more\">[MORE]</div><div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div><div id=\"more\">[CONTINUED]</div><div id=\"diaCont\">" + diaArr[s] + "<br />";
+							fullBring = fullBring + "</p><p id=\"more\">[MORE]</p></div></div><div id=\"pageCenter\" </div><div id=\"pageCenter\" style=\"top:" + JSON.stringify((currentPage*972)+164) + "px;\"><div id=\"page\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div><p id=\"more\">[CONTINUED]</p><p id=\"diaCont\">" + diaArr[s] + "<br />";
+							console.log("This one!");
 
 						} else {
 							fullBring = fullBring + diaArr[s] + "<br />";
@@ -155,6 +162,10 @@ _.extend(Passage.prototype, {
 				}
 			}
 		}
+		if (window.story.sketchMode === false){
+			fullBring = "<div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div>" + fullBring;
+		}
+		console.log(fullBring);
 		return fullBring;
 	},
 
@@ -194,11 +205,12 @@ _.extend(Passage.prototype, {
 				lineLength = 65;
 				break;
 		}
+
 		if (lineType == "cha" || lineType == "sch" || lineType == "tra"){
 			input = input.toUpperCase();
 		} 
 
-		if (positions.length == 1){
+		if (positions.length === 1){
 			inputArr[0] = input;
 		} else {
 			ss=0;			
@@ -209,23 +221,21 @@ _.extend(Passage.prototype, {
 					inputArr[ss] = input.substring(i,i+lineLength);
 				}
 				ss++;
-				if (inputArr[ss] == ""){
+				if (inputArr[ss] === ""){
 					delete inputArr[ss];
 					break;
 				}
 			}
 		}
 		for (i=0; i<inputArr.length; i++){
-			if (inputArr[i] == ""){
+			if (inputArr[i] === ""){
 				delete inputArr[i];
 			}
 		}
 		inputArr = $.grep(inputArr,function(n){ return(n); });//kills all the undefineds. 
-
-		console.log(inputArr);
 		if (inputArr.length != 1) {
 			for (s=0;s<inputArr.length-1;s++){
-				console.log(inputArr[s]);
+				//console.log(inputArr[s]);
 				inputArr[s+1] = inputArr[s].slice(inputArr[s].lastIndexOf(" ") + 1) + inputArr[s+1];
 				inputArr[s] = inputArr[s].slice(0,inputArr[s].lastIndexOf(" "));
 
@@ -234,7 +244,7 @@ _.extend(Passage.prototype, {
 		for (s=0; s<inputArr.length; s++){
 			if (positions[s].pageNumber > page){
 				//always put it at the beginning...
-				addPageLine = "<div id=\"page\" style=\"position:relative;left:-73px;top:100px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div><div id=\"chaCont\">";
+				addPageLine = "</div></div><div id=\"pageCenter\" style=\"top:" + JSON.stringify((page*972)+164) + "px;\"><div id=\"page\" ><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div>";
 				addingPages = true;
 				page++;
 				break;
@@ -244,18 +254,20 @@ _.extend(Passage.prototype, {
 		}
 		for (i=0; i<inputArr.length; i++){
 			if (inputArr.length == 1){
-				output = "<div id=\"" + lineType + "\">" + inputArr[i] + "</div>";
+				output = "<p id=\"" + lineType + "Cont\">" + inputArr[i] + "</p>";
 			} else {
 				if (i === 0) {
-					output = "<div id=\"" + lineType + "\">" + inputArr[i] + "<br />";
+					output = "<p id=\"" + lineType + "Cont\">" + inputArr[i] + "<br />";
 				} else if (i == inputArr.length-1){
-					output = output + inputArr[i] + "</div>";
+					output = output + inputArr[i] + "</p>";
 				} else {
 					output = output + inputArr[i] + "<br />";
 				}
 			}
 		}
-		return [addPageLine + output, addingPages];
+		output = addPageLine + output;
+		//console.log(output);
+		return [output, addingPages];
 	},
 
 
@@ -326,60 +338,6 @@ _.extend(Passage.prototype, {
 		}
 		return finishedLink;
 	}),
-
-
-	_pageParser: (function(t, c, w) { //t=type, c=content, w=width //obsolete.
-		//This function automatically figures out how many pages that a passage uses and generates pages accordingly.
-		var npAtFront = false;
-		var result = '';
-		//console.log(c.length);
-
-		if (t == "cha" || t== "act" ||t == "sch" || t == "tra" || t == "link" || t == "sketch") {
-			this.pageHeight++;
-			if (this.pageHeight >=90){
-				npAtFront = true;
-			} else {
-				npAtFront = false;
-			}
-		}
-		if (npAtFront === true) {
-			this.pageHeight = 0;
-		}
-		var i = 0;
-		var s = 0; //s is a dummy iterator, so we can build the array as needed without being limited to c(ontent).length
-		var lineArr = []; //an array holding each line.
-		for (i=0; i<c.length;i+=w) {
-			if (i===0){
-				lineArr[s] = c.substring(0,w);
-			} else {
-				lineArr[s] = c.substring(i,w+i);
-			}
-			//console.log(c);
-			s++;
-			this.pageHeight++;
-			//console.log(this.pageHeight);
-			
-			if (this.pageHeight>=90) {
-				if (window.story.sketchMode === false){
-					lineArr[s] = "</div><div id=\"moreCont\">[MORE]</div></div><br /><div id=\"page\" style=\"position:relative;left:-100px;top:100px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div><div id=\"" + t +"\">";
-				} else {
-					console.log(t);
-					lineArr[s] = "</div><br /><div id=\"page\" style=\"position:relative;left:-100px;top:100px;\"><li>" + t;
-				}
-				s++;
-				this.pageHeight = 0;
-			}
-		}
-		if (npAtFront === true) {
-			if (window.story.sketchMode === false) {
-				return ")(<div id=\"page\" style=\"position:relative;left:-73px;top:83px;\"><div id=\"holePunch\"><h1 class=\"tophole\">m</h1><h1 class=\"midhole\">m</h1><h1 class=\"bothole\">m</h1></div><div id=\"" + t + "\">" + lineArr.join(""); //The )( is so we can easily tell it later.
-			} else {
-				return "</ul><div id=\"page\" style=\"position:relative;left:-73px;top:83px;\"><div id=\"" + t + "\"><ul><li>" + lineArr.join("");
-			}
-		} else {
-			return lineArr.join("");
-		}
-	})
 });
 
 
